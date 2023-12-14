@@ -1,0 +1,457 @@
+# Default values for central-settlement.
+# This is a YAML-formatted file.
+# Declare global configurations
+global: {}
+# Declare variables to be passed into your templates.
+image:
+  registry: docker.io
+  repository: mojaloop/central-settlement
+  tag: v16.0.0
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+replicaCount: 1
+command: '["node", "src/handlers/index.js", "h", "--grossSettlement"]'
+## Enable diagnostic mode in the deployment
+##
+diagnosticMode:
+  ## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
+  ##
+  enabled: false
+  ## @param diagnosticMode.command Command to override all containers in the deployment
+  ##
+  command:
+    - node
+    - src/handlers/index.js
+    - h
+    - '--grossSettlement'
+  ## @param diagnosticMode.args Args to override all containers in the deployment
+  ##
+  args:
+    - --inspect=0.0.0.0:{{ .Values.diagnosticMode.debug.port }}
+  ## @param diagnosticMode.debug config to override all debug information
+  ##
+  debug:
+    internalPort: 9229
+    port: 9229
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /v2/health
+  initialDelaySeconds: 60
+  periodSeconds: 15
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /v2/health
+  initialDelaySeconds: 60
+  periodSeconds: 15
+## Pod scheduling preferences.
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+nodeSelector: {}
+## Set toleration for scheduler
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
+## Configure Container Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+## @param containerSecurityContext.enabled Enabled %%MAIN_CONTAINER_NAME%% containers' Security Context
+## @param containerSecurityContext.runAsUser Set %%MAIN_CONTAINER_NAME%% containers' Security Context runAsUser
+##
+containerSecurityContext:
+  enabled: true
+  runAsUser: 1001
+sidecar:
+  enabled: false
+  image:
+    repository: mojaloop/event-sidecar
+    tag: v12.0.0
+    pullPolicy: IfNotPresent
+    command: '["npm", "run", "start"]'
+  service:
+    internalPort: 4001
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+    initialDelaySeconds: 120
+    periodSeconds: 15
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /health
+    initialDelaySeconds: 90
+    periodSeconds: 15
+  config:
+    event_log_grpc_host: localhost
+    event_log_grpc_port: 50051
+    event_log_filter: 'audit:*, log:info, log:warn, log:error'
+    event_log_metadata_only: true
+    log_level: info
+    log_filter: 'error, warn, info'
+## metric configuration for prometheus instrumentation
+metrics:
+  ## flag to enable/disable the metrics end-points
+  enabled: false
+  config:
+    timeout: 5000
+    prefix: moja_
+    defaultLabels:
+      serviceName: central-handler-position
+config:
+  ## Kafka Configuration
+  # this can be set if the dependency chart for kafka is disabled. If 'kafka_host' is commented out, then the name of the dependency chart will be used.
+  kafka_host: kafka
+  kafka_port: 9092
+  kafka_partitioner: 'murmur2_random'
+  kafka:
+    consumer:
+      notification:
+        close:
+          config:
+            options:
+              mode: 2
+              batchSize: 1
+              pollFrequency: 10
+              recursiveTimeout: 100
+              messageCharset: 'utf8'
+              messageAsJSON: true
+              sync: true
+              consumeTimeout: 1000
+            rdkafkaConf:
+              socket_keepalive_enable: true
+        event:
+          config:
+            options:
+              mode: 2
+              batchSize: 1
+              pollFrequency: 10
+              recursiveTimeout: 100
+              messageCharset: 'utf8'
+              messageAsJSON: true
+              sync: true
+              consumeTimeout: 1000
+            rdkafkaConf:
+              socket_keepalive_enable: true
+      deferredsettlement:
+        close:
+          config:
+            options:
+              mode: 2
+              batchSize: 1
+              pollFrequency: 10
+              recursiveTimeout: 100
+              messageCharset: 'utf8'
+              messageAsJSON: true
+              sync: true
+              consumeTimeout: 1000
+            rdkafkaConf:
+              socket_keepalive_enable: true
+    producer:
+      notification:
+        event:
+          config:
+            options:
+              messageCharset: 'utf8'
+            rdkafkaConf:
+              event_cb: true
+              compression_codec: 'none'
+              retry_backoff_ms: 100
+              message_send_max_retries: 2
+              socket_keepalive_enable: true
+              batch_num_messages: 100
+              dr_cb: false
+              socket_blocking_max_ms: 1
+              queue_buffering_max_ms: 1
+              broker_version_fallback: '0.10.1.0'
+              api_version_request: true
+            topicConf:
+              request_required_acks: 'all'
+              partitioner: 'murmur2_random'
+      deferredsettlement:
+        close:
+          config:
+            options:
+              messageCharset: 'utf8'
+            rdkafkaConf:
+              event_cb: true
+              dr_cb: true
+              socket_keepalive_enable: true
+            topicConf:
+              request_required_acks: "all"
+              partitioner: 'murmur2_random'
+  ## DB Configuration
+  # db_type can either be 'postgres' or 'mysql'. Ensure the correct DB is enabled and configured below: postgresql.enabled or mysql.enabled
+  db_type: 'mysql'
+  # db_driver can either be 'pg' or 'mysql'. Ensure the correct corresponding db_type above has been set.
+  db_driver: 'mysql'
+  db_host: mysqldb
+  db_port: 3306
+  db_user: central_ledger
+  ## Secret-Management
+  ### Set this if you are using a clear password configured in the config section
+  db_password: ''
+  ### Configure this if you want to use a secret. Note, this will override the db_password,
+  ### Use the next line if you do wish to use the db_password value instead.
+  # db_secret:
+  ### Example config for an existing secret
+  # db_secret:
+  #   name: mysqldb
+  #   key: mysql-password
+  db_database: central_ledger
+  db_connection_pool_min: 10
+  db_connection_pool_max: 30
+  db_acquire_timeout_millis: 30000
+  db_create_timeout_millis: 30000
+  db_destroy_timeout_millis: 5000
+  db_idle_timeout_millis: 30000
+  db_reap_interval_millis: 1000
+  db_create_retry_interval_millis: 200
+  db_debug: false
+  ## Api Handler Configuration
+  handlers:
+    disabled: false
+    api:
+      disabled: false
+    settings:
+      scripts_folder: 'scripts/grosssettlementTemp'
+  ## Settlement Window aggregation Configuration
+  window_aggregation:
+    retry_count: 3
+    retry_interval: 3000
+  hub_participant:
+    id: 1
+    name: Hub
+  ## Log config
+  log_level: info
+  log_transport: file
+  ## Tracing Configuration
+  event_trace_vendor: mojaloop
+  event_log_filter: 'audit:*, log:warn, log:error'
+  # If set to true, only the metadata object from the event will be printed.
+  event_log_metadata_only: false
+  # A comma-separated list of events that should return immediately instead of waiting for the event promises to resolve
+  # Any combination of: `log,audit,trace`
+  event_async_override: 'log,trace'
+  event_trace_state_enabled: true
+  event_traceid_per_vendor: false
+  ## Error Handling
+  error_handling:
+    include_cause_extension: false
+    truncate_extensions: true
+  rules: {}
+  ## The rules object defines rules files represented as key-value pairs. These rules will be executed per commited transfer.
+  ## Expected key-value format for the rules object:
+  ##  nameOfFile.js: fileContents
+  ## See below example of interchange fee rule.
+  # interchangeFeeCalculation.js: |
+  #   /* eslint-disable no-undef */
+  #   // ********************************************************
+  #   // Name: Interchange fee calculation
+  #   // Type: notification
+  #   // Action: commit
+  #   // Status: success
+  #   // Start: 2020-06-01T00:00:00.000Z
+  #   // End: 2100-12-31T23:59:59.999Z
+  #   // Description: This script calculates the interchange fees between DFSPs where the account type is "Wallet"
+  #   // ********************************************************
+  ## Globals:
+  #   // payload: The contents of the message from the Kafka topic.
+  #   // transfer: The transfer object.
+  #   // # Functions:
+  ## Data retrieval functions:
+  #   // getTransfer(transferId): Retrieves a mojaloop transfer from the central-ledger API.
+  ## Helper functions:
+  #   // getExtensionValue(list, key): Gets a value from an extension list
+  #   // log(message): allows the script to log to standard out for debugging purposes
+  #   // Math functions:
+  #   // multiply(number1, number2, decimalPlaces): Uses ml-number to handle multiplication of money values
+  #   // Ledger functions:
+  #   // addLedgerEntry: Adds a debit and credit ledger entry to the specified account to the specified DFSPs
+  #   log(JSON.stringify(transfer))
+  #   const payerFspId = transfer.payer.partyIdInfo.fspId
+  #   const payeeFspId = transfer.payee.partyIdInfo.fspId
+  #   if ((payeeFspId !== payerFspId) &&
+  #     (getExtensionValue(transfer.payee.partyIdInfo.extensionList.extension, 'accountType') === 'Wallet' &&
+  #       getExtensionValue(transfer.payer.partyIdInfo.extensionList.extension, 'accountType') === 'Wallet') &&
+  #     (transfer.transactionType.scenario === 'TRANSFER' &&
+  #       transfer.transactionType.initiator === 'PAYER' &&
+  #       transfer.transactionType.initiatorType === 'CONSUMER')) {
+  #     log(`Adding an interchange fee for Wallet to Wallet from ${payerFspId} to ${payeeFspId}`)
+  #     addLedgerEntry(payload.id, 'INTERCHANGE_FEE', // Ledger account type Id
+  #       'INTERCHANGE_FEE', // Ledger entry type Id
+  #       multiply(transfer.amount.amount, 0.006, 2),
+  #       transfer.amount.currency,
+  #       payerFspId,
+  #       payeeFspId)
+  #   }
+## @param initContainers Add additional init containers to the %%MAIN_CONTAINER_NAME%% pod(s)
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+## e.g:
+## initContainers:
+##  - name: your-image-name
+##    image: your-image
+##    imagePullPolicy: Always
+##    command: ['sh', '-c', 'echo "hello world"']
+##
+# initContainers: []
+initContainers: |
+  - name: wait-for-kafka
+    image: solsson/kafka:2.8.1
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+      - -c
+      - until ./bin/kafka-broker-api-versions.sh --bootstrap-server ${KAFKA_HOST}:${KAFKA_PORT}; 
+        do
+          echo --------------------;
+          echo Waiting for Kafka...;
+          sleep 2; 
+        done;
+        echo ====================; 
+        echo Kafka ok!;
+    env:
+      - name: KAFKA_HOST
+        value: '{{ .Values.config.kafka_host }}'
+      - name: KAFKA_PORT
+        value: '{{ .Values.config.kafka_port }}'
+  - name: wait-for-mysql
+    image: mysql:5.7
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+      - -c
+      - |
+        until result=$(mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} --password=${DB_PASSWORD} ${DB_DATABASE} -ss -N -e 'select is_locked from migration_lock;') && eval 'echo is_locked=$result' && if [ -z $result ]; then false; fi && if [ $result -ne 0 ]; then false; fi;
+        do
+          echo --------------------;
+          echo Waiting for MySQL...;
+          sleep 2; 
+        done;
+        echo ====================; 
+        echo MySQL ok!;
+    env:
+      - name: DB_HOST
+        value: '{{ .Values.config.db_host }}'
+      - name: DB_PORT
+        value: '{{ .Values.config.db_port }}'
+      - name: DB_USER
+        value: '{{ .Values.config.db_user }}'
+      - name: DB_PASSWORD
+        {{- if .Values.config.db_secret }}
+        valueFrom:
+            secretKeyRef:
+              name: '{{ .Values.config.db_secret.name }}'
+              key: '{{ .Values.config.db_secret.key }}'
+        {{- else }}
+        value: {{ .Values.config.db_password }}
+        {{- end }}
+      - name: DB_DATABASE
+        value: '{{ .Values.config.db_database }}'
+service:
+  internalPort: 3007
+  ## @param service.type %%MAIN_CONTAINER_NAME%% service type
+  ##
+  type: ClusterIP
+  ## @param service.port %%MAIN_CONTAINER_NAME%% service HTTP port
+  ##
+  port: 80
+  ## @param service.clusterIP %%MAIN_CONTAINER_NAME%% service Cluster IP
+  ## e.g.:
+  ## clusterIP: None
+  ##
+  clusterIP: null ## @param service.loadBalancerIP %%MAIN_CONTAINER_NAME%% service Load Balancer IP
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+##
+  loadBalancerIP: null ## @param service.loadBalancerSourceRanges %%MAIN_CONTAINER_NAME%% service Load Balancer sources
+## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+## e.g:
+## loadBalancerSourceRanges:
+##   - 10.10.10.0/24
+##
+  loadBalancerSourceRanges: []
+  ## @param service.externalTrafficPolicy %%MAIN_CONTAINER_NAME%% service external traffic policy
+  ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
+  externalTrafficPolicy: Cluster
+  ## @param service.annotations Additional custom annotations for %%MAIN_CONTAINER_NAME%% service
+  ##
+  annotations: {}
+  ## @param master.service.sessionAffinity Session Affinity for Kubernetes service, can be "None" or "ClientIP"
+  ## If "ClientIP", consecutive client requests will be directed to the same Pod
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
+  ##
+  sessionAffinity: None
+  ## @param master.service.sessionAffinityConfig Additional settings for the sessionAffinity
+  ## sessionAffinityConfig:
+  ##   clientIP:
+  ##     timeoutSeconds: 300
+  ##
+  sessionAffinityConfig: {}
+ingress:
+  enabled: true
+  ## @param ingress.pathType Ingress path type
+  ##
+  pathType: ImplementationSpecific
+  ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+  ##
+  apiVersion: null ## @param ingress.hostname Default host for the ingress record
+##
+  hostname: central-settlement-grosssettlement.local
+  ## @param servicePort : port for the service
+  ##
+  servicePort: 80
+  ## @param ingress.path Default path for the ingress record
+  ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+  path: /
+  ## @param ingress.annotations Additional custom annotations for the ingress record
+  ## NOTE: If `ingress.certManager=true`, annotation `kubernetes.io/tls-acme: "true"` will automatically be added
+  ##
+  annotations: null ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+## You can:
+##   - Use the `ingress.secrets` parameter to create this TLS secret
+##   - Relay on cert-manager to create it by setting `ingress.certManager=true`
+##   - Relay on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+##
+  tls: false
+  ## @param ingress.certManager Add the corresponding annotations for cert-manager integration
+  ##
+  certManager: false
+  ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+  ##
+  selfSigned: false
+  ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+  ## e.g:
+  ## extraHosts:
+  ##   - name: transfer-api-svc.local
+  ##     path: /
+  ##
+  extraHosts: null
+  extraPaths: null
+  extraTls: null
+  secrets: null
+  className: "nginx"
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# limits:
+#  cpu: 100m
+#  memory: 128Mi
+# requests:
+#  cpu: 100m
+#  memory: 128Mi
+resources: {}

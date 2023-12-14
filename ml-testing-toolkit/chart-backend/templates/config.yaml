@@ -1,0 +1,36 @@
+{{- $RELEASE_NAME := .Release.Name -}}
+{{- $PARAMETERS := .Values.parameters -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ml-testing-toolkit-backend.fullname" . }}-config-default
+  labels:
+    app.kubernetes.io/name: {{ include "ml-testing-toolkit-backend.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+data:
+  {{- range $k, $v := .Values.config_files }}
+    {{ $k }}: |
+      {{- include "common.tplvalues.render" (dict "value" ($v | toPrettyJson | replace "$release_name" $RELEASE_NAME) "context" $) | nindent 6 }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ml-testing-toolkit-backend.fullname" . }}-config-extra-environments
+  labels:
+    app.kubernetes.io/name: {{ include "ml-testing-toolkit-backend.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+data:
+  {{- range $k, $v := .Values.extraEnvironments }}
+    {{- $environmentFileContent := ($v | toPrettyJson | squote | replace "$release_name" $RELEASE_NAME) -}}
+    {{- range $paramName, $paramValue := $PARAMETERS }}
+      {{- $environmentFileContent = ($environmentFileContent | replace (printf "$param_%s" $paramName) $paramValue) -}}
+    {{- end }}
+    {{ $k }}: {{ ($environmentFileContent)  }}
+  {{- end }}

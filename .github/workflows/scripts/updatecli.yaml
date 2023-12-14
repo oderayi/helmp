@@ -1,0 +1,16 @@
+sources:
+    lastMinorRelease:
+       kind: helmchart
+       spec:
+           url: "file://./chart-service"
+           name: "account-lookup-service"
+           version: "*.*.*"
+conditions: {}
+targets:
+   chart:
+       name: Bump Chart dependencies
+       kind: helmchart
+       spec:
+           name: "/home/steven/Projects/mojaloop/helm/account-lookup-service"
+           file: "Chart.yaml"
+           key: "$.dependencies[0].version"

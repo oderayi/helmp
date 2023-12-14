@@ -1,0 +1,30 @@
+apiVersion: v2
+description: bulk-api-adapter Helm chart for Kubernetes
+name: bulk-api-adapter
+version: 13.1.0
+appVersion: "15.0.3"
+home: http://mojaloop.io
+icon: http://mojaloop.io/images/logo.png
+sources:
+  - https://github.com/mojaloop/mojaloop
+  - https://github.com/mojaloop/helm
+  - https://github.com/mojaloop/bulk-api-adapter
+maintainers:
+  - name: Miguel de Barros
+    email: miguel.debarros@modusbox.com
+  - name: Tom Daly
+    email: tomd@crosslaketech.com
+dependencies:
+  - name: bulk-api-adapter-service
+    version: 13.0.0
+    repository: "file://./chart-service"
+    condition: bulk-api-adapter-service.enabled
+  - name: bulk-api-adapter-handler-notification
+    version: 13.0.0
+    repository: "file://./chart-handler-notification"
+    condition: bulk-api-adapter-handler-notification.enabled
+  - name: common
+    repository: https://mojaloop.github.io/charts/repo
+    version: 2.1.0
+    tags:
+      - moja-common

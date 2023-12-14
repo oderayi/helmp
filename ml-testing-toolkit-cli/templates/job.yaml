@@ -1,0 +1,32 @@
+{{- if .Values.scheduling.enabled }}
+apiVersion: {{ template "ml-testing-toolkit-cli.apiVersion.CronJob" . }}
+kind: CronJob
+metadata:
+  name: {{ template "ml-testing-toolkit-cli.fullname" . }}
+spec:
+  schedule: {{ .Values.scheduling.cronSchedule | quote }}
+  suspend: {{ .Values.scheduling.suspend }}
+  successfulJobsHistoryLimit: {{ .Values.scheduling.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.scheduling.failedJobsHistoryLimit }}
+  timeZone: {{ .Values.scheduling.timeZone | quote }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.backoffLimit }}
+      restartPolicy: {{ .Values.restartPolicy }}
+      {{- include "ml-testing-toolkit-cli.jobtemplate" . | nindent 6 }}
+{{- else if not .Values.tests.enabled }}
+apiVersion: {{ template "ml-testing-toolkit-cli.apiVersion.Job" . }}
+kind: Job
+metadata:
+  name: {{ template "ml-testing-toolkit-cli.fullname" . }}
+  {{- if .Values.postInstallHook.enabled }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": {{ .Values.postInstallHook.weight | quote }}
+    "helm.sh/hook-delete-policy": {{ .Values.postInstallHook.deletePolicy }}
+  {{- end }}
+spec:
+  backoffLimit: {{ .Values.backoffLimit }}
+  restartPolicy: {{ .Values.restartPolicy }}
+  {{- include "ml-testing-toolkit-cli.jobtemplate" . | indent 2 }}
+{{- end }}

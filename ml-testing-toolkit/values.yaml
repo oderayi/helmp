@@ -1,0 +1,74 @@
+# This is a YAML-formatted file.
+# Declare global configurations
+global: {}
+
+ml-testing-toolkit-backend:
+  enabled: true
+  # ingress:
+  #   enabled: true
+  #   hosts:
+  #     specApi:
+  #       host: testing-toolkit-specapi.localdomain
+  #       port: 4040
+  #       paths: ['/']
+  #     adminApi:
+  #       host: testing-toolkit.localdomain
+  #       port: 5050
+  #       paths: ['/api/', '/socket.io/']
+  config:
+    ## We can specify the files and folders here those we want to override in the TTK `spec_files` directory.
+    ## For example, you can specify user_config.json, system_config.json ...etc
+    ## Files inside the folders can be defined with full path of the files with slashes replaced by two underscores `__`.
+    ## For example, `rules_response__default.json`, `rules_callback__default.json`, `rules_validation__default.json` ...etc
+    ## We can pass the JSON content as the value for the parameters
+    ## Or we can pass a http/https URL for the JSON file as the value for the parameters. Then the file will be downloaded and replaced in the corresponding location.
+    ## Ex: rules_callback__default.json: "https://raw.githubusercontent.com/mojaloop/ml-testing-toolkit/master/spec_files/rules_callback/default.json"
+    system_config.json:
+      HOSTING_ENABLED: false
+      OAUTH:
+        AUTH_ENABLED: false
+      CONNECTION_MANAGER:
+        AUTH_ENABLED: false
+      KEYCLOAK:
+        ENABLED: false
+      # # For Hosted Mode
+      # HOSTING_ENABLED: true
+      # OAUTH:
+      #   AUTH_ENABLED: true
+      # CONNECTION_MANAGER:
+      #   AUTH_ENABLED: true
+      # KEYCLOAK:
+      #   ENABLED: true
+
+  config:
+    mongodb:
+      host: "ttk-mongodb"
+      port: "27017"
+      user: "ttk"
+      ## Secret-Management
+      ### Set this if you are using a clear password configured in the config section
+      password: ''
+      ### Configure this if you want to use a secret. Note, this will override the db_password,
+      ### Use the next line if you do wish to use the db_password value instead.
+      # secret:
+      ### Example config for an existing secret
+      # secret:
+      #   name: ttk-mongodb
+      #   key: mongodb-passwords
+      database: "ttk"
+
+ml-testing-toolkit-frontend:
+  enabled: true
+  # ingress:
+  #   enabled: true
+  #   # Used to create an Ingress record.
+  #   hosts:
+  #     ui:
+  #       host: testing-toolkit.localdomain
+  #       port: 6060
+  #       paths: ['/']
+  config:
+    AUTH_ENABLED: "FALSE" ## "TRUE" or "FALSE"
+    # API_BASE_URL: http://ttk-bankend-url
+    # # For Hosted Mode
+    # AUTH_ENABLED: "TRUE"

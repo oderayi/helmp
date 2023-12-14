@@ -1,0 +1,22 @@
+apiVersion: v2
+description: Central Event Processor for Mojaloop
+name: centraleventprocessor
+version: 13.0.1
+appVersion: "12.0.0"
+home: http://mojaloop.io
+icon: http://mojaloop.io/images/logo.png
+sources:
+  - https://github.com/mojaloop/mojaloop
+  - https://github.com/mojaloop/helm
+  - https://github.com/mojaloop/central-event-processor
+maintainers:
+  - name: Miguel de Barros
+    email: miguel.debarros@modusbox.com
+  - name: Tom Daly
+    email: tomd@crosslaketech.com
+dependencies:
+  - name: common
+    repository: https://mojaloop.github.io/charts/repo
+    version: 2.1.0
+    tags:
+      - moja-common

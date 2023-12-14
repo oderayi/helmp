@@ -1,0 +1,30 @@
+apiVersion: v2
+description: ml-api-adapter Helm chart for Kubernetes
+name: ml-api-adapter
+version: 13.1.0
+appVersion: "14.0.0"
+home: http://mojaloop.io
+icon: http://mojaloop.io/images/logo.png
+sources:
+  - https://github.com/mojaloop/mojaloop
+  - https://github.com/mojaloop/helm
+  - https://github.com/mojaloop/ml-api-adapter
+maintainers:
+  - name: Miguel de Barros
+    email: miguel.debarros@modusbox.com
+  - name: Tom Daly
+    email: tomd@crosslaketech.com
+dependencies:
+  - name: ml-api-adapter-service
+    version: 13.0.0
+    repository: "file://./chart-service"
+    condition: ml-api-adapter-service.enabled
+  - name: ml-api-adapter-handler-notification
+    version: 13.0.0
+    repository: "file://./chart-handler-notification"
+    condition: ml-api-adapter-handler-notification.enabled
+  - name: common
+    repository: https://mojaloop.github.io/charts/repo
+    version: 2.1.0
+    tags:
+        - moja-common

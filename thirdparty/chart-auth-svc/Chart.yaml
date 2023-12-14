@@ -1,0 +1,22 @@
+apiVersion: v2
+description: auth-svc chart for Mojaloop Thirdparty Services
+name: auth-svc
+version: 3.2.0
+appVersion: "14.0.0"
+home: http://mojaloop.io
+icon: http://mojaloop.io/images/logo.png
+sources:
+  - https://github.com/mojaloop/mojaloop
+  - https://github.com/mojaloop/helm
+  - https://github.com/mojaloop/auth-service
+maintainers:
+  - name: Tom Daly
+    email: tomd@crosslaketech.com
+  - name: Miguel de Barros
+    email: miguel.debarros@modusbox.com
+dependencies:
+  - name: common
+    repository: https://mojaloop.github.io/charts/repo
+    version: 2.1.0
+    tags:
+      - moja-common

@@ -23,11 +23,11 @@ jobs:
           ref: master
           fetch-depth: 1
 
-      # - name: Set up Helm
-      #   id: setup-helm
-      #   uses: azure/setup-helm@v3
-      #   with:
-      #     version: v3.13.3
+      - name: Set up Helm
+        id: setup-helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.13.3
 
       # - uses: actions/setup-python@v5
       #   id: setup-python

@@ -1,3 +1,7 @@
+# NOTES:
+# - GitHub Actions must be explicitly allowed to create pull requests in this repository. This setting can be found in a repository's settings under Actions > General > Workflow permissions. 
+# - A secret `CPR_TOKEN` (permissions: `contents: write` and `pull-requests: write`) needs to be created in repository secrets. This token is used by the `create-pull-request` action to create the pull request.
+
 name: Create release PR
 
 on: 

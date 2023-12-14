@@ -1,0 +1,13 @@
+name: "updatecli-helm"
+scms:
+    default:
+        kind: github
+        spec:
+            branch: main
+            email: oderayi@gmail.com
+            owner: oderayi
+            repository: helm
+            token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+            user: oderayi
+            username: '{{ requiredEnv "UPDATECLI_GITHUB_ACTOR" }}'
+        disabled: false

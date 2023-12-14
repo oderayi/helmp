@@ -7,7 +7,7 @@ global: {}
 # Declare variables to be passed into your templates.
 
 image:
-  registry: docker.io
+  registry: "docker.io"
   repository: mojaloop/event-stream-processor
   tag: v12.0.0-snapshot.7
   ## Specify a imagePullPolicy
@@ -170,6 +170,16 @@ initContainers: |
         value: '{{ .Values.config.kafka_host }}'
       - name: KAFKA_PORT
         value: '{{ .Values.config.kafka_port }}'
+
+## @param master.podLabels Extra labels for pod(s)
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+##
+podLabels: {}
+
+## @param podAnnotations Additional custom annotations for pod(s)
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+podAnnotations: {}
 
 service:
   internalPort: 3082

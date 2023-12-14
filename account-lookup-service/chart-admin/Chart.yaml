@@ -1,6 +1,6 @@
 apiVersion: v2
-version: 14.3.0
-appVersion: "14.1.0"
+version: 14.2.0
+appVersion: "14.2.5"
 description: A Helm chart for Kubernetes
 name: account-lookup-service-admin
 maintainers:
@@ -8,9 +8,11 @@ maintainers:
     email: miguel.debarros@modusbox.com
   - name: Tom Daly
     email: tomd@crosslaketech.com
+  - name: Steven Oderayi
+    email: steven.oderayi@infitx.com
 dependencies:
   - name: common
     repository: "https://mojaloop.github.io/charts/repo"
-    version: 2.1.0
+    version: 2.0.0
     tags:
       - moja-common

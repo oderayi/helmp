@@ -20,9 +20,3 @@
 .idea/
 *.tmproj
 *IGNORE*
-
-# Updatecli
-updatecli.d/
-
-# Github Actions
-.github/

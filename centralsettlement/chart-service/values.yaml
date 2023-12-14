@@ -1,12 +1,14 @@
 # Default values for central-settlement.
 # This is a YAML-formatted file.
+
 # Declare global configurations
 global: {}
+
 # Declare variables to be passed into your templates.
 image:
-  registry: docker.io
+  registry: "docker.io"
   repository: mojaloop/central-settlement
-  tag: v16.0.0
+  tag: v15.0.4
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -20,8 +22,10 @@ image:
   ##   - myRegistryKeySecretName
   ##
   pullSecrets: []
+
 replicaCount: 1
 command: '["node", "src/handlers/index.js", "h", "--grossSettlement"]'
+
 ## Enable diagnostic mode in the deployment
 ##
 diagnosticMode:
@@ -30,7 +34,7 @@ diagnosticMode:
   enabled: false
   ## @param diagnosticMode.command Command to override all containers in the deployment
   ##
-  command:
+  command: 
     - node
     - src/handlers/index.js
     - h
@@ -39,32 +43,39 @@ diagnosticMode:
   ##
   args:
     - --inspect=0.0.0.0:{{ .Values.diagnosticMode.debug.port }}
+  
   ## @param diagnosticMode.debug config to override all debug information
   ##
   debug:
     internalPort: 9229
     port: 9229
+
 readinessProbe:
   enabled: true
   httpGet:
     path: /v2/health
   initialDelaySeconds: 60
   periodSeconds: 15
+
 livenessProbe:
   enabled: true
   httpGet:
     path: /v2/health
   initialDelaySeconds: 60
   periodSeconds: 15
+
 ## Pod scheduling preferences.
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 affinity: {}
+
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
 nodeSelector: {}
+
 ## Set toleration for scheduler
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
+
 ## Configure Container Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 ## @param containerSecurityContext.enabled Enabled %%MAIN_CONTAINER_NAME%% containers' Security Context
@@ -73,11 +84,12 @@ tolerations: []
 containerSecurityContext:
   enabled: true
   runAsUser: 1001
+
 sidecar:
   enabled: false
   image:
     repository: mojaloop/event-sidecar
-    tag: v12.0.0
+    tag: v13.0.1
     pullPolicy: IfNotPresent
     command: '["npm", "run", "start"]'
   service:
@@ -101,6 +113,7 @@ sidecar:
     event_log_metadata_only: true
     log_level: info
     log_filter: 'error, warn, info'
+
 ## metric configuration for prometheus instrumentation
 metrics:
   ## flag to enable/disable the metrics end-points
@@ -110,6 +123,7 @@ metrics:
     prefix: moja_
     defaultLabels:
       serviceName: central-handler-position
+
 config:
   ## Kafka Configuration
   # this can be set if the dependency chart for kafka is disabled. If 'kafka_host' is commented out, then the name of the dependency chart will be used.
@@ -220,6 +234,7 @@ config:
   db_reap_interval_millis: 1000
   db_create_retry_interval_millis: 200
   db_debug: false
+
   ## Api Handler Configuration
   handlers:
     disabled: false
@@ -227,6 +242,7 @@ config:
       disabled: false
     settings:
       scripts_folder: 'scripts/grosssettlementTemp'
+
   ## Settlement Window aggregation Configuration
   window_aggregation:
     retry_count: 3
@@ -234,9 +250,11 @@ config:
   hub_participant:
     id: 1
     name: Hub
+
   ## Log config
   log_level: info
   log_transport: file
+
   ## Tracing Configuration
   event_trace_vendor: mojaloop
   event_log_filter: 'audit:*, log:warn, log:error'
@@ -247,56 +265,67 @@ config:
   event_async_override: 'log,trace'
   event_trace_state_enabled: true
   event_traceid_per_vendor: false
+
   ## Error Handling
   error_handling:
     include_cause_extension: false
     truncate_extensions: true
+
   rules: {}
-  ## The rules object defines rules files represented as key-value pairs. These rules will be executed per commited transfer.
-  ## Expected key-value format for the rules object:
-  ##  nameOfFile.js: fileContents
-  ## See below example of interchange fee rule.
-  # interchangeFeeCalculation.js: |
-  #   /* eslint-disable no-undef */
-  #   // ********************************************************
-  #   // Name: Interchange fee calculation
-  #   // Type: notification
-  #   // Action: commit
-  #   // Status: success
-  #   // Start: 2020-06-01T00:00:00.000Z
-  #   // End: 2100-12-31T23:59:59.999Z
-  #   // Description: This script calculates the interchange fees between DFSPs where the account type is "Wallet"
-  #   // ********************************************************
-  ## Globals:
-  #   // payload: The contents of the message from the Kafka topic.
-  #   // transfer: The transfer object.
-  #   // # Functions:
-  ## Data retrieval functions:
-  #   // getTransfer(transferId): Retrieves a mojaloop transfer from the central-ledger API.
-  ## Helper functions:
-  #   // getExtensionValue(list, key): Gets a value from an extension list
-  #   // log(message): allows the script to log to standard out for debugging purposes
-  #   // Math functions:
-  #   // multiply(number1, number2, decimalPlaces): Uses ml-number to handle multiplication of money values
-  #   // Ledger functions:
-  #   // addLedgerEntry: Adds a debit and credit ledger entry to the specified account to the specified DFSPs
-  #   log(JSON.stringify(transfer))
-  #   const payerFspId = transfer.payer.partyIdInfo.fspId
-  #   const payeeFspId = transfer.payee.partyIdInfo.fspId
-  #   if ((payeeFspId !== payerFspId) &&
-  #     (getExtensionValue(transfer.payee.partyIdInfo.extensionList.extension, 'accountType') === 'Wallet' &&
-  #       getExtensionValue(transfer.payer.partyIdInfo.extensionList.extension, 'accountType') === 'Wallet') &&
-  #     (transfer.transactionType.scenario === 'TRANSFER' &&
-  #       transfer.transactionType.initiator === 'PAYER' &&
-  #       transfer.transactionType.initiatorType === 'CONSUMER')) {
-  #     log(`Adding an interchange fee for Wallet to Wallet from ${payerFspId} to ${payeeFspId}`)
-  #     addLedgerEntry(payload.id, 'INTERCHANGE_FEE', // Ledger account type Id
-  #       'INTERCHANGE_FEE', // Ledger entry type Id
-  #       multiply(transfer.amount.amount, 0.006, 2),
-  #       transfer.amount.currency,
-  #       payerFspId,
-  #       payeeFspId)
-  #   }
+    ## The rules object defines rules files represented as key-value pairs. These rules will be executed per commited transfer.
+    ## Expected key-value format for the rules object:
+    ##  nameOfFile.js: fileContents
+    ## See below example of interchange fee rule.
+
+    # interchangeFeeCalculation.js: |
+    #   /* eslint-disable no-undef */
+    #   // ********************************************************
+    #   // Name: Interchange fee calculation
+    #   // Type: notification
+    #   // Action: commit
+    #   // Status: success
+    #   // Start: 2020-06-01T00:00:00.000Z
+    #   // End: 2100-12-31T23:59:59.999Z
+    #   // Description: This script calculates the interchange fees between DFSPs where the account type is "Wallet"
+    #   // ********************************************************
+
+           ## Globals:
+    #   // payload: The contents of the message from the Kafka topic.
+    #   // transfer: The transfer object.
+
+    #   // # Functions:
+           ## Data retrieval functions:
+    #   // getTransfer(transferId): Retrieves a mojaloop transfer from the central-ledger API.
+
+           ## Helper functions:
+    #   // getExtensionValue(list, key): Gets a value from an extension list
+    #   // log(message): allows the script to log to standard out for debugging purposes
+
+    #   // Math functions:
+    #   // multiply(number1, number2, decimalPlaces): Uses ml-number to handle multiplication of money values
+
+    #   // Ledger functions:
+    #   // addLedgerEntry: Adds a debit and credit ledger entry to the specified account to the specified DFSPs
+
+    #   log(JSON.stringify(transfer))
+    #   const payerFspId = transfer.payer.partyIdInfo.fspId
+    #   const payeeFspId = transfer.payee.partyIdInfo.fspId
+
+    #   if ((payeeFspId !== payerFspId) &&
+    #     (getExtensionValue(transfer.payee.partyIdInfo.extensionList.extension, 'accountType') === 'Wallet' &&
+    #       getExtensionValue(transfer.payer.partyIdInfo.extensionList.extension, 'accountType') === 'Wallet') &&
+    #     (transfer.transactionType.scenario === 'TRANSFER' &&
+    #       transfer.transactionType.initiator === 'PAYER' &&
+    #       transfer.transactionType.initiatorType === 'CONSUMER')) {
+    #     log(`Adding an interchange fee for Wallet to Wallet from ${payerFspId} to ${payeeFspId}`)
+    #     addLedgerEntry(payload.id, 'INTERCHANGE_FEE', // Ledger account type Id
+    #       'INTERCHANGE_FEE', // Ledger entry type Id
+    #       multiply(transfer.amount.amount, 0.006, 2),
+    #       transfer.amount.currency,
+    #       payerFspId,
+    #       payeeFspId)
+    #   }
+
 ## @param initContainers Add additional init containers to the %%MAIN_CONTAINER_NAME%% pod(s)
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 ## e.g:
@@ -360,6 +389,17 @@ initContainers: |
         {{- end }}
       - name: DB_DATABASE
         value: '{{ .Values.config.db_database }}'
+
+## @param master.podLabels Extra labels for pod(s)
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+##
+podLabels: {}
+
+## @param podAnnotations Additional custom annotations for pod(s)
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+##
+podAnnotations: {}
+
 service:
   internalPort: 3007
   ## @param service.type %%MAIN_CONTAINER_NAME%% service type
@@ -372,15 +412,17 @@ service:
   ## e.g.:
   ## clusterIP: None
   ##
-  clusterIP: null ## @param service.loadBalancerIP %%MAIN_CONTAINER_NAME%% service Load Balancer IP
-## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
-##
-  loadBalancerIP: null ## @param service.loadBalancerSourceRanges %%MAIN_CONTAINER_NAME%% service Load Balancer sources
-## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
-## e.g:
-## loadBalancerSourceRanges:
-##   - 10.10.10.0/24
-##
+  clusterIP:
+  ## @param service.loadBalancerIP %%MAIN_CONTAINER_NAME%% service Load Balancer IP
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+  ##
+  loadBalancerIP:
+  ## @param service.loadBalancerSourceRanges %%MAIN_CONTAINER_NAME%% service Load Balancer sources
+  ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+  ## e.g:
+  ## loadBalancerSourceRanges:
+  ##   - 10.10.10.0/24
+  ##
   loadBalancerSourceRanges: []
   ## @param service.externalTrafficPolicy %%MAIN_CONTAINER_NAME%% service external traffic policy
   ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
@@ -400,6 +442,7 @@ service:
   ##     timeoutSeconds: 300
   ##
   sessionAffinityConfig: {}
+
 ingress:
   enabled: true
   ## @param ingress.pathType Ingress path type
@@ -407,8 +450,9 @@ ingress:
   pathType: ImplementationSpecific
   ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
   ##
-  apiVersion: null ## @param ingress.hostname Default host for the ingress record
-##
+  apiVersion:
+  ## @param ingress.hostname Default host for the ingress record
+  ##
   hostname: central-settlement-grosssettlement.local
   ## @param servicePort : port for the service
   ##
@@ -419,13 +463,14 @@ ingress:
   ## @param ingress.annotations Additional custom annotations for the ingress record
   ## NOTE: If `ingress.certManager=true`, annotation `kubernetes.io/tls-acme: "true"` will automatically be added
   ##
-  annotations: null ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
-## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
-## You can:
-##   - Use the `ingress.secrets` parameter to create this TLS secret
-##   - Relay on cert-manager to create it by setting `ingress.certManager=true`
-##   - Relay on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
-##
+  annotations:
+  ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+  ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+  ## You can:
+  ##   - Use the `ingress.secrets` parameter to create this TLS secret
+  ##   - Relay on cert-manager to create it by setting `ingress.certManager=true`
+  ##   - Relay on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+  ##
   tls: false
   ## @param ingress.certManager Add the corresponding annotations for cert-manager integration
   ##
@@ -439,11 +484,12 @@ ingress:
   ##   - name: transfer-api-svc.local
   ##     path: /
   ##
-  extraHosts: null
-  extraPaths: null
-  extraTls: null
-  secrets: null
+  extraHosts:
+  extraPaths:
+  extraTls:
+  secrets:
   className: "nginx"
+
 # We usually recommend not to specify default resources and to leave this as a conscious
 # choice for the user. This also increases chances charts run on environments with little
 # resources, such as Minikube. If you do want to specify resources, uncomment the following

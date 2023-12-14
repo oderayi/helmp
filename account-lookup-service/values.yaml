@@ -5,9 +5,9 @@ account-lookup-service:
   # Declare variables to be passed into your templates.
 
   image:
-    registry: docker.io
+    registry: "docker.io"
     repository: mojaloop/account-lookup-service
-    tag: v14.1.0
+    tag: v14.2.5
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
     ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -307,9 +307,9 @@ account-lookup-service-admin:
   # Declare variables to be passed into your templates.
 
   image:
-    registry: docker.io
+    registry: "docker.io"
     repository: mojaloop/account-lookup-service
-    tag: v14.1.0
+    tag: v14.2.5
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
     ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images

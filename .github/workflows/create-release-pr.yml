@@ -4,7 +4,6 @@ on:
     workflow_dispatch:
     # THIS IS TEMPORARY TO ALLOW WORKFLOW RUN WITHOUT MERGING
     pull_request:
-      types: ['opened', 'edited']
 
 jobs:
   create_release_pr:

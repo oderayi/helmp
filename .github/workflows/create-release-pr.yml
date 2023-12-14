@@ -23,21 +23,21 @@ jobs:
           ref: master
           fetch-depth: 1
 
-      - name: Set up Helm
-        id: setup-helm
-        uses: azure/setup-helm@v3
-        with:
-          version: v3.13.3
+      # - name: Set up Helm
+      #   id: setup-helm
+      #   uses: azure/setup-helm@v3
+      #   with:
+      #     version: v3.13.3
 
-      - uses: actions/setup-python@v5
-        id: setup-python
-        with:
-          python-version: 3.12.1
+      # - uses: actions/setup-python@v5
+      #   id: setup-python
+      #   with:
+      #     python-version: 3.12.1
 
-      - name: Install pyaml
-        id: install-pyaml
-        run: |
-          pip3 install pyaml==23.9.7
+      # - name: Install pyaml
+      #   id: install-pyaml
+      #   run: |
+      #     pip3 install pyaml==23.9.7
 
       - name: Install UpdateCLI
         id: install-updatecli

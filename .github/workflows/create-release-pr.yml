@@ -11,38 +11,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Helm
+        id: setup-helm
         uses: azure/setup-helm@v3
         with:
           version: v3.13.3
 
       - uses: actions/setup-python@v5
+        id: setup-python
         with:
           python-version: 3.12.1
 
       - name: Install pyaml
+        id: install-pyaml
         run: |
           pip3 install pyaml==23.9.7
 
       - name: Install UpdateCLI
+        id: install-updatecli
         run: |
           curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
           sudo apt install /tmp/updatecli_amd64.deb
 
-      - name:
-          Upgrade chart dependencies
+      - name: Upgrade chart dependencies
+        id: upgrade-chart-dependencies
           #  run: |
           #    python scripts/chart_bumper.py
           #    rm -f manifest.yaml
         run: updatecli apply --experimental
+        # we expect this to exit with non-zero exit code, so we need to set continue-on-error to true
+        continue-on-error: true
 
         # NOTE: For this action to work GitHub Actions must be explicitly allowed to create pull requests.
         # This setting can be found in a repository's settings under Actions > General > Workflow permissions.
       - name: Create Pull Request
+        id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: "chore: upgrade helm chart depdenencies"

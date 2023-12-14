@@ -1,45 +1,49 @@
-name: Upgrade helm charts minor versions
- 
+name: Create release PR
+
 on: workflow_dispatch
- 
+
 jobs:
- upgrade-helm-charts:
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout
-       uses: actions/checkout@v2
-       with:
-         fetch-depth: 0
- 
-     - name: Set up Helm
-       uses: azure/setup-helm@v1
-       with:
-         version: v3.7.2
- 
-     - uses: actions/setup-python@v2
-       with:
-         python-version: 3.7
-      
-     - name: install pyaml
-       run: |
-         pip3 install pyaml==21.10.1
- 
-     - name: install updateCli
-       run: |
-         curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
-         sudo apt install /tmp/updatecli_amd64.deb
- 
-     - name: Run chart bumper script
-       run: |
-         python scripts/chart_bumper.py
-         rm -f manifest.yaml
- 
-     - name: Create Pull Request
-       uses: peter-evans/create-pull-request@v4
-       with:
-         commit-message: "feat: upgrade helm charts"
-         title: "chore: upgrade helm charts minor versions"
-         body: |
-           Automatic upgrade of helm chart minor versions using https://github.com/updatecli/updatecli
-         branch: upgrade-helm-charts-minors
-         base: main
+  create_release_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.13.3
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12.1
+
+      - name: Install pyaml
+        run: |
+          pip3 install pyaml==23.9.7
+
+      - name: Install UpdateCLI
+        run: |
+          curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
+          sudo apt install /tmp/updatecli_amd64.deb
+
+      - name:
+          Upgrade chart dependencies
+          #  run: |
+          #    python scripts/chart_bumper.py
+          #    rm -f manifest.yaml
+        run: updatecli apply --experimental
+
+        # NOTE: For this action to work GitHub Actions must be explicitly allowed to create pull requests.
+        # This setting can be found in a repository's settings under Actions > General > Workflow permissions.
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "chore: upgrade helm chart depdenencies"
+          title: "[auto] feat: release candidate"
+          body: |
+            Release candidate for the next version of the helm charts.
+          branch: release/release-candidate-${{ github.run_id }}
+          base: master

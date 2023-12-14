@@ -1,0 +1,18 @@
+dependencies:
+- name: fluentd-elasticsearch
+  repository: https://kokuwaio.github.io/helm-charts
+  version: 13.11.0
+- name: elasticsearch
+  repository: https://helm.elastic.co
+  version: 8.5.1
+- name: kibana
+  repository: https://helm.elastic.co
+  version: 8.5.1
+- name: apm-server
+  repository: https://helm.elastic.co
+  version: 8.5.1
+- name: common
+  repository: https://mojaloop.github.io/charts/repo
+  version: 2.1.0
+digest: sha256:4fcccda2218b61ffce8369b2684556fe04dee5eab79d7555dd9f9a8467db34c7
+generated: "2023-12-14T14:31:40.644856179Z"

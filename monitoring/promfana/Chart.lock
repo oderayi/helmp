@@ -1,0 +1,12 @@
+dependencies:
+- name: prometheus
+  repository: https://charts.helm.sh/stable
+  version: 11.12.1
+- name: grafana
+  repository: https://charts.helm.sh/stable
+  version: 5.5.7
+- name: common
+  repository: https://mojaloop.github.io/charts/repo
+  version: 2.1.0
+digest: sha256:a8628308157f9f92b4db2bc8510dab4575d2af6935dcf51c376c1e485060dde6
+generated: "2023-12-14T14:31:53.930939496Z"

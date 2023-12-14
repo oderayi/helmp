@@ -57,7 +57,7 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
-          # token: ${{ secrets.CPR_TOKEN }}
+          token: ${{ secrets.CPR_TOKEN }}
           commit-message: "chore: upgrade helm chart depdenencies"
           title: "[auto] feat: release candidate"
           body: |

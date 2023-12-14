@@ -1,6 +1,8 @@
 # NOTES:
-# - GitHub Actions must be explicitly allowed to create pull requests in this repository. This setting can be found in a repository's settings under Actions > General > Workflow permissions. 
-# - A secret `CPR_TOKEN` (permissions: `contents: write` and `pull-requests: write`) needs to be created in repository secrets. This token is used by the `create-pull-request` action to create the pull request.
+# - GitHub Actions must be explicitly allowed to create pull requests in this repository. 
+#   This setting can be found in a repository's settings under Actions > General > Workflow permissions. 
+# - A secret `CPR_TOKEN` (permissions: `contents: write` and `pull-requests: write`) needs to be created in repository secrets. 
+#   This token is used by the `create-pull-request` action to create the pull request.
 
 name: Create release PR
 
@@ -48,12 +50,17 @@ jobs:
           #    python scripts/chart_bumper.py
           #    rm -f manifest.yaml
         run: updatecli apply --experimental
-        # we expect this to exit with non-zero exit code, so we need to set continue-on-error to true
+        # we expect this step to exit with non-zero exit code, so we need to set continue-on-error to true
         continue-on-error: true
       
-      # step: detect breaking changes (default.json changes, migration scripts changes, presence of phrase "BREAKING CHANGE" in changelogs, etc.)
+      # step: detect breaking changes (default.json changes, migration scripts changes, 
+      #       presence of phrase "BREAKING CHANGE" in changelogs, etc.)
 
       # step: gather changelogs and generate release note
+
+      # step: try linting and updating charts
+
+      # step: deploy charts to staging environment
 
         # NOTE: For this action to work GitHub Actions must be explicitly allowed to create pull requests.
         # This setting can be found in a repository's settings under Actions > General > Workflow permissions.

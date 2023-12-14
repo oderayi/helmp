@@ -2,19 +2,20 @@ name: Create release PR
 
 on: 
     workflow_dispatch:
+    # THIS IS TEMPORARY TO ALLOW WORKFLOW RUN WITHOUT MERGING
     pull_request:
-      branches:
-        - master
+      types: ['opened', 'edited']
 
 jobs:
   create_release_pr:
+    if: '!github.event.pull_request.draft'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Helm
         id: setup-helm
@@ -46,6 +47,10 @@ jobs:
         run: updatecli apply --experimental
         # we expect this to exit with non-zero exit code, so we need to set continue-on-error to true
         continue-on-error: true
+      
+      # step: detect breaking changes (default.json changes, migration scripts changes, presence of phrase "BREAKING CHANGE" in changelogs, etc.)
+
+      # step: gather changelogs and generate release note
 
         # NOTE: For this action to work GitHub Actions must be explicitly allowed to create pull requests.
         # This setting can be found in a repository's settings under Actions > General > Workflow permissions.
@@ -53,9 +58,11 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
+          # token: ${{ secrets.CPR_TOKEN }}
           commit-message: "chore: upgrade helm chart depdenencies"
           title: "[auto] feat: release candidate"
           body: |
             Release candidate for the next version of the helm charts.
           branch: release/release-candidate-${{ github.run_id }}
           base: master
+          draft: true

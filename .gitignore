@@ -7,6 +7,9 @@
 launch.json
 
 # General Ignores
+*IGNORE*
+*ignore*
+!.gitignore
 *.log
 .env
 

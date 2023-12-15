@@ -23,12 +23,14 @@ targets:
       name: bulk-api-adapter
       file: values.yaml
       key: $.bulk-api-adapter-service.image.tag
+      appversion: true
   bulk-api-adapter-handler-notification:
     sourceid: bulk-api-adapter
     kind: yaml
     spec:
       file: bulk-api-adapter/values.yaml
       key: $.bulk-api-adapter-handler-notification.image.tag
+      appversion: true
   chart-adapter-notification__bulk-api-adapter:
     sourceid: bulk-api-adapter
     kind: helmchart

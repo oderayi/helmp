@@ -20,7 +20,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
         with:
-          ref: master # TODO: This should be changed to the tag of the previous release
+          ref: master
           fetch-depth: 1
 
       - name: Set up Helm

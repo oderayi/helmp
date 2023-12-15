@@ -36,6 +36,7 @@ targets:
       name: bulk-api-adapter/chart-handler-notification
       file: values.yaml
       key: $.image.tag
+      appversion: true
   chart-service__bulk-api-adapter:
     sourceid: bulk-api-adapter
     kind: helmchart
@@ -43,3 +44,4 @@ targets:
       name: bulk-api-adapter/chart-service
       file: values.yaml
       key: $.image.tag
+      appversion: true

@@ -1,0 +1,27 @@
+name: centralenduserregistry
+
+sources:
+  central-end-user-registry:
+    kind: githubrelease
+    spec:
+      owner: mojaloop
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      repository: central-end-user-registry
+
+conditions:
+  docker-central-end-user-registry:
+    sourceid: central-end-user-registry
+    kind: dockerimage
+    spec:
+      image: mojaloop/central-end-user-registry
+
+targets:
+  root:
+    sourceid: central-end-user-registry
+    kind: helmchart
+    spec:
+      name: centralenduserregistry
+      file: values.yaml
+      key: $.image.tag
+      appversion: true
+  

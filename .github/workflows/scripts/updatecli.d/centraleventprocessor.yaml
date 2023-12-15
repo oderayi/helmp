@@ -1,0 +1,27 @@
+name: centraleventprocessor
+
+sources:
+  central-event-processor:
+    kind: githubrelease
+    spec:
+      owner: mojaloop
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      repository: central-event-processor
+
+conditions:
+  docker-central-event-processor:
+    sourceid: central-event-processor
+    kind: dockerimage
+    spec:
+      image: mojaloop/central-event-processor
+
+targets:
+  root:
+    sourceid: central-event-processor
+    kind: helmchart
+    spec:
+      name: centraleventprocessor
+      file: values.yaml
+      key: $.image.tag
+      appversion: true
+  

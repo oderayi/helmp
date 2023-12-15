@@ -20,7 +20,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: master # TODO: This should be changed to the tag of the previous release
           fetch-depth: 1
 
       - name: Set up Helm
@@ -69,7 +69,8 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.CPR_TOKEN }}
+          # NOTE: This token should have permissions (`contents: write` and `pull-requests: write`)
+          token: ${{ secrets.CPR_TOKEN }} # TODO: Find better name for this token
           commit-message: "chore: upgrade helm chart depdenencies"
           title: "[auto] feat: release candidate"
           body: |

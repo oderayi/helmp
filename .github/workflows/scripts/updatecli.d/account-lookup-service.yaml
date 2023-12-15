@@ -66,7 +66,7 @@ targets:
       name: account-lookup-service
       file: values.yaml
       key: $.als-oracle-pathfinder.image.tag
-  chart_admin__account-lookup-service:
+  chart_admin__root:
     sourceid: account-lookup-service
     kind: helmchart
     spec:
@@ -74,14 +74,14 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart_admin__event-sidecar:
+  chart_admin__sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:
       name: account-lookup-service/chart-admin
       file: values.yaml
       key: $.sidecar.image.tag
-  chart_service__account-lookup-service:
+  chart_service__root:
     sourceid: account-lookup-service
     kind: helmchart
     spec:
@@ -89,7 +89,7 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart_service__event-sidecar:
+  chart_service__sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:

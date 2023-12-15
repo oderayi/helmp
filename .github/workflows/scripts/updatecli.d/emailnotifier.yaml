@@ -1,0 +1,26 @@
+name: emailnotifier
+
+sources:
+  email-notifier:
+    kind: githubrelease
+    spec:
+      owner: mojaloop
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      repository: email-notifier
+
+conditions:
+  docker-email-notifier:
+    sourceid: email-notifier
+    kind: dockerimage
+    spec:
+      image: mojaloop/email-notifier
+
+targets:
+  email-notifier:
+    sourceid: email-notifier
+    kind: helmchart
+    spec:
+      name: emailnotifier
+      file: values.yaml
+      key: $.image.tag
+      appversion: true

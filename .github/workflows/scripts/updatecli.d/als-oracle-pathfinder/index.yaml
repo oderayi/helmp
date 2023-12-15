@@ -1,0 +1,25 @@
+name: als-oracle-pathfinder
+
+sources:
+  als-oracle-pathfinder:
+    kind: githubrelease
+    spec:
+      owner: mojaloop
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      repository: als-oracle-pathfinder
+  
+conditions:
+  docker-als-oracle-pathfinder:
+    sourceid: als-oracle-pathfinder
+    kind: dockerimage
+    spec:
+      image: mojaloop/als-oracle-pathfinder
+
+targets:
+  als-oracle-pathfinder:
+    sourceid: als-oracle-pathfinder
+    kind: helmchart
+    spec:
+      name: als-oracle-pathfinder
+      file: values.yaml
+      key: $.image.tag

@@ -1,22 +1,5 @@
-name: "updatecli-helm"
+name: account-lookup-service
 
-# scms:
-#     default:
-#         kind: github
-#         spec:
-#             branch: main
-#             email: oderayi@gmail.com
-#             owner: oderayi
-#             repository: helmp
-#             token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
-#             user: oderayi
-#             username: '{{ requiredEnv "UPDATECLI_GITHUB_ACTOR" }}'
-#         disabled: false
-
-# autodiscovery:
-#   scmid: default
-
-# account-lookup-service values
 sources:
   account-lookup-service:
     kind: githubrelease
@@ -30,6 +13,12 @@ sources:
       owner: mojaloop
       token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
       repository: als-oracle-pathfinder
+  event-sidecar:
+    kind: githubrelease
+    spec:
+      owner: mojaloop
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      repository: event-sidecar
   
 conditions:
   docker-account-lookup-service:
@@ -42,31 +31,45 @@ conditions:
     kind: dockerimage
     spec:
       image: mojaloop/als-oracle-pathfinder
+  docker-event-sidecar:
+    sourceid: event-sidecar
+    kind: dockerimage
+    spec:
+      image: mojaloop/event-sidecar
 
 targets:
   account-lookup-service:
     sourceid: account-lookup-service
-    kind: yaml
-    spec:
-      file: account-lookup-service/values.yaml
-      key: $.account-lookup-service.image.tag
-  account-lookup-service-admin:
-    sourceid: account-lookup-service
-    kind: yaml
-    spec:
-      file: account-lookup-service/values.yaml
-      key: $.account-lookup-service-admin.image.tag
-  als-oracle-pathfinder:
-    sourceid: als-oracle-pathfinder
-    kind: yaml
-    spec:
-      file: account-lookup-service/values.yaml
-      key: $.als-oracle-pathfinder.image.tag    
-  Chart.yaml:
-    sourceid: account-lookup-service
-    name: "Chart.yaml"
     kind: helmchart
     spec:
       name: account-lookup-service
-      file: Chart.yaml
-      key: $.version 
+      file: values.yaml
+      key: $.account-lookup-service.image.tag
+  account-lookup-service-admin:
+    sourceid: account-lookup-service
+    kind: helmchart
+    spec:
+      name: account-lookup-service
+      file: values.yaml
+      key: $.account-lookup-service-admin.image.tag
+  als-oracle-pathfinder:
+    sourceid: als-oracle-pathfinder
+    kind: helmchart
+    spec:
+      name: account-lookup-service
+      file: values.yaml
+      key: $.als-oracle-pathfinder.image.tag
+  chart_admin__account-lookup-service:
+    sourceid: account-lookup-service
+    kind: helmchart
+    spec:
+      name: account-lookup-service/chart-admin
+      file: values.yaml
+      key: $.image.tag
+  chart_admin__event-sidecar:
+    sourceid: event-sidecar
+    kind: helmchart
+    spec:
+      name: account-lookup-service/chart-admin
+      file: values.yaml
+      key: $.sidecar.image.tag

@@ -1,0 +1,26 @@
+name: eventstreamprocessor
+
+sources:
+  event-stream-processor:
+    kind: githubrelease
+    spec:
+      owner: mojaloop
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      repository: event-stream-processor
+
+conditions:
+  docker-event-stream-processor:
+    sourceid: event-stream-processor
+    kind: dockerimage
+    spec:
+      image: mojaloop/event-stream-processor
+
+targets:
+ event-stream-processor:
+    sourceid: event-stream-processor
+    kind: helmchart
+    spec:
+      name: eventstreamprocessor
+      file: values.yaml
+      key: $.image.tag
+      appversion: true

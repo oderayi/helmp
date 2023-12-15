@@ -9,7 +9,7 @@ name: Create release PR
 on: 
     workflow_dispatch:
     # THIS IS TEMPORARY TO ALLOW WORKFLOW RUN WITHOUT MERGING
-    pull_request:
+    # pull_request:
 
 jobs:
   create_release_pr:

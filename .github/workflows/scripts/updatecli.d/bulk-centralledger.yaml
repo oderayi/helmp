@@ -1,0 +1,74 @@
+name: bulk-centralledger
+
+sources:
+  central-ledger:
+    kind: githubrelease
+    spec:
+      owner: mojaloop
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      repository: central-ledger
+
+conditions:
+  docker-central-ledger:
+    sourceid: central-ledger
+    kind: dockerimage
+    spec:
+      image: mojaloop/central-ledger
+
+targets:
+  cl-handler-bulk-transfer-prepare:
+    sourceid: central-ledger
+    kind: helmchart
+    spec:
+      name: bulk-centralledger
+      file: values.yaml
+      key: $.cl-handler-bulk-transfer-prepare.image.tag
+      appversion: true
+  cl-handler-bulk-transfer-fulfil:
+    sourceid: central-ledger
+    kind: helmchart
+    spec:
+      name: bulk-centralledger
+      file: values.yaml
+      key: $.cl-handler-bulk-transfer-fulfil.image.tag
+      appversion: true
+  cl-handler-bulk-transfer-processing:
+    sourceid: central-ledger
+    kind: helmchart
+    spec:
+      name: bulk-centralledger
+      file: values.yaml
+      key: $.cl-handler-bulk-transfer-processing.image.tag
+      appversion: true
+  cl-handler-bulk-transfer-get:
+    sourceid: central-ledger
+    kind: helmchart
+    spec:
+      name: bulk-centralledger
+      file: values.yaml
+      key: $.cl-handler-bulk-transfer-get.image.tag
+      appversion: true
+  chart-handler-bulk-transfer-fulfil:
+    sourceid: central-ledger
+    kind: helmchart
+    spec:
+      name: bulk-centralledger/chart-handler-bulk-transfer-fulfil
+      file: values.yaml
+      key: $.image.tag
+      appversion: true
+  chart-handler-bulk-transfer-get:
+    sourceid: central-ledger
+    kind: helmchart
+    spec:
+      name: bulk-centralledger/chart-handler-bulk-transfer-get
+      file: values.yaml
+      key: $.image.tag
+      appversion: true
+  chart-handler-bulk-transfer-prepare:
+    sourceid: central-ledger
+    kind: helmchart
+    spec:
+      name: bulk-centralledger/chart-handler-bulk-transfer-prepare
+      file: values.yaml
+      key: $.image.tag
+      appversion: true

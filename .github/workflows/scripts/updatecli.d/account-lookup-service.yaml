@@ -66,10 +66,26 @@ targets:
       name: account-lookup-service/chart-admin
       file: values.yaml
       key: $.image.tag
+      appversion: true
   chart_admin__event-sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:
       name: account-lookup-service/chart-admin
+      file: values.yaml
+      key: $.sidecar.image.tag
+  chart_service__account-lookup-service:
+    sourceid: account-lookup-service
+    kind: helmchart
+    spec:
+      name: account-lookup-service/chart-service
+      file: values.yaml
+      key: $.image.tag
+      appversion: true
+  chart_service__event-sidecar:
+    sourceid: event-sidecar
+    kind: helmchart
+    spec:
+      name: account-lookup-service/chart-service
       file: values.yaml
       key: $.sidecar.image.tag

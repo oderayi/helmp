@@ -38,6 +38,13 @@ conditions:
       image: mojaloop/event-sidecar
 
 targets:
+  appVersion:
+    sourceid: account-lookup-service
+    kind: file
+    spec:
+      file: account-lookup-service/Chart.yaml
+      matchpattern: '(account-lookup-service:) (v[\d\.]+); (als-oracle-pathfinder:) (v[\d\.]+)'
+      replacepattern: '$1 {{ source "account-lookup-service" }}; $3 {{ source "als-oracle-pathfinder" }}'
   account-lookup-service:
     sourceid: account-lookup-service
     kind: helmchart

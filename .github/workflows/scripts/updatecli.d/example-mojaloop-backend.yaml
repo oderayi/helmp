@@ -25,13 +25,34 @@ sources:
 conditions: {}
 
 targets:
-  appVersion:
+  appVersion-mysql:
+    sourceid: mysql
+    kind: file
+    spec:
+      file: example-mojaloop-backend/Chart.yaml
+      matchpattern: '(mysql:) ([\d\.]+)'
+      replacepattern: '$1 {{ source "mysql" }}'
+  appVersion-kafka:
     sourceid: kafka
     kind: file
     spec:
       file: example-mojaloop-backend/Chart.yaml
-      matchpattern: '(nginx:) (v[\d\.]+); (mysql:) (v[\d\.]+); (kafka:) (v[\d\.]+); (mongodb:) (v[\d\.]+); (redis:) (v[\d\.]+)'
-      replacepattern: '$1 $2; $3 {{ source "mysql" }}; $5 {{ source "kafka" }}; $7 {{ source "mongodb" }}; $9 {{ source "redis" }}'
+      matchpattern: '(kafka:) ([\d\.]+)'
+      replacepattern: '$1 {{ source "kafka" }}'
+  appVersion-mongodb:
+    sourceid: mongodb
+    kind: file
+    spec:
+      file: example-mojaloop-backend/Chart.yaml
+      matchpattern: '(mongodb:) ([\d\.]+)'
+      replacepattern: '$1 {{ source "mongodb" }}'
+  appVersion-redis:
+    sourceid: redis
+    kind: file
+    spec:
+      file: example-mojaloop-backend/Chart.yaml
+      matchpattern: '(redis:) ([\d\.]+)'
+      replacepattern: '$1 {{ source "redis" }}'
   kafka:
     sourceid: kafka
     kind: helmchart

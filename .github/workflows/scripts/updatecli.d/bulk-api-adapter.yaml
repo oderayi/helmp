@@ -7,6 +7,11 @@ sources:
       owner: mojaloop
       token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
       repository: bulk-api-adapter
+  common:
+    kind: helmchart
+    spec: 
+      url: https://mojaloop.github.io/charts/repo
+      name: common
   
 conditions:
   docker-bulk-api-adapter:
@@ -31,6 +36,13 @@ targets:
       file: bulk-api-adapter/values.yaml
       key: $.bulk-api-adapter-handler-notification.image.tag
       appversion: true
+  common:
+    sourceid: common
+    kind: helmchart
+    spec:
+      name: bulk-api-adapter
+      file: Chart.yaml
+      key: $.dependencies[2].version
   chart-adapter-notification:
     sourceid: bulk-api-adapter
     kind: helmchart
@@ -39,6 +51,13 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
+  chart-adapter-notification--common:
+    sourceid: common
+    kind: helmchart
+    spec:
+      name: bulk-api-adapter/chart-handler-notification
+      file: Chart.yaml
+      key: $.dependencies[0].version
   chart-service:
     sourceid: bulk-api-adapter
     kind: helmchart
@@ -47,3 +66,10 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
+  chart-service--common:
+    sourceid: common
+    kind: helmchart
+    spec:
+      name: bulk-api-adapter/chart-service
+      file: Chart.yaml
+      key: $.dependencies[0].version

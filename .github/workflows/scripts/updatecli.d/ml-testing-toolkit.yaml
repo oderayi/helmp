@@ -1,0 +1,73 @@
+name: ml-testing-toolkit
+
+sources:
+  ml-testing-toolkit:
+    kind: githubrelease
+    spec:
+      owner: mojaloop
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      repository: ml-testing-toolkit
+  ml-testing-toolkit-ui:
+    kind: githubrelease
+    spec:
+      owner: mojaloop
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      repository: ml-testing-toolkit-ui
+  common:
+    kind: helmchart
+    spec: 
+      url: https://mojaloop.github.io/charts/repo
+      name: common
+  
+conditions:
+  docker-ml-testing-toolkit:
+    sourceid: ml-testing-toolkit
+    kind: dockerimage
+    spec:
+      image: mojaloop/ml-testing-toolkit
+  docker-ml-testing-toolkit-ui:
+    sourceid: ml-testing-toolkit-ui
+    kind: dockerimage
+    spec:
+      image: mojaloop/ml-testing-toolkit-ui
+
+targets:
+  common:
+    sourceid: common
+    kind: helmchart
+    spec:
+      name: ml-testing-toolkit
+      file: Chart.yaml
+      key: $.dependencies[0].version
+  
+  chart-handler-notification:
+    sourceid: ml-testing-toolkit
+    kind: helmchart
+    spec:
+      name: ml-testing-toolkit/chart-handler-notification
+      file: values.yaml
+      key: $.image.tag
+      appversion: true
+  chart-handler-notification--sidecar:
+    sourceid: ml-testing-toolkit
+    kind: helmchart
+    spec:
+      name: ml-testing-toolkit/chart-handler-notification
+      file: values.yaml
+      key: $.sidecar.image.tag
+      appversion: true
+  chart-service:
+    sourceid: ml-testing-toolkit
+    kind: helmchart
+    spec:
+      name: ml-testing-toolkit/chart-service
+      file: values.yaml
+      key: $.image.tag
+      appversion: true
+  chart-service--sidecar:
+    sourceid: event-sidecar
+    kind: helmchart
+    spec:
+      name: ml-testing-toolkit/chart-service
+      file: values.yaml
+      key: $.sidecar.image.tag

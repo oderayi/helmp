@@ -42,7 +42,6 @@ targets:
       name: centralledger
       file: values.yaml
       key: $.centralledger-service.sidecar.image.tag
-      appversion: true
   centralledger-handler-transfer-prepare:
     sourceid: central-ledger
     kind: helmchart
@@ -74,7 +73,6 @@ targets:
       name: centralledger
       file: values.yaml
       key: $.centralledger-handler-transfer-position.sidecar.image.tag
-      appversion: true
   centralledger-handler-transfer-get:
     sourceid: central-ledger
     kind: helmchart
@@ -90,7 +88,6 @@ targets:
       name: centralledger
       file: values.yaml
       key: $.centralledger-handler-transfer-get.sidecar.image.tag
-      appversion: true
   centralledger-handler-transfer-fulfil:
     sourceid: central-ledger
     kind: helmchart
@@ -106,7 +103,6 @@ targets:
       name: centralledger
       file: values.yaml
       key: $.centralledger-handler-transfer-fulfil.sidecar.image.tag
-      appversion: true
   centralledger-handler-timeout:
     sourceid: central-ledger
     kind: helmchart
@@ -122,7 +118,6 @@ targets:
       name: centralledger
       file: values.yaml
       key: $.centralledger-handler-timeout.sidecar.image.tag
-      appversion: true
   centralledger-handler-admin-transfer:
     sourceid: central-ledger
     kind: helmchart
@@ -138,7 +133,6 @@ targets:
       name: centralledger
       file: values.yaml
       key: $.centralledger-handler-admin-transfer.sidecar.image.tag
-      appversion: true
   chart-handler-admin-transfer:
     sourceid: central-ledger
     kind: helmchart
@@ -154,7 +148,6 @@ targets:
       name: centralledger/chart-handler-admin-transfer
       file: values.yaml
       key: $.sidecar.image.tag
-      appversion: true
   chart-handler-timeout:
     sourceid: central-ledger
     kind: helmchart
@@ -170,7 +163,6 @@ targets:
       name: centralledger/chart-handler-timeout
       file: values.yaml
       key: $.sidecar.image.tag
-      appversion: true
   chart-handler-transfer-fulfil:
     sourceid: central-ledger
     kind: helmchart
@@ -186,7 +178,6 @@ targets:
       name: centralledger/chart-handler-transfer-fulfil
       file: values.yaml
       key: $.sidecar.image.tag
-      appversion: true
   chart-handler-transfer-get:
     sourceid: central-ledger
     kind: helmchart
@@ -202,7 +193,6 @@ targets:
       name: centralledger/chart-handler-transfer-get
       file: values.yaml
       key: $.sidecar.image.tag
-      appversion: true
   chart-handler-transfer-position:
     sourceid: central-ledger
     kind: helmchart
@@ -218,7 +208,6 @@ targets:
       name: centralledger/chart-handler-transfer-position
       file: values.yaml
       key: $.sidecar.image.tag
-      appversion: true
   chart-handler-transfer-prepare:
     sourceid: central-ledger
     kind: helmchart
@@ -234,7 +223,6 @@ targets:
       name: centralledger/chart-handler-transfer-prepare
       file: values.yaml
       key: $.sidecar.image.tag
-      appversion: true
   chart-service:
     sourceid: central-ledger
     kind: helmchart
@@ -250,4 +238,4 @@ targets:
       name: centralledger/chart-service
       file: values.yaml
       key: $.sidecar.image.tag
-      appversion: true
+      

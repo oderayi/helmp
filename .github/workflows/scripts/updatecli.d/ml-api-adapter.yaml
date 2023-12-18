@@ -47,7 +47,6 @@ targets:
       name: ml-api-adapter
       file: values.yaml
       key: $.ml-api-adapter-service.sidecar.image.tag
-      appversion: true
   ml-api-adapter-handler-notification:
     sourceid: ml-api-adapter
     kind: helmchart
@@ -63,7 +62,6 @@ targets:
       name: ml-api-adapter
       file: values.yaml
       key: $.ml-api-adapter-handler-notification.sidecar.image.tag
-      appversion: true
   common:
     sourceid: common
     kind: helmchart
@@ -71,7 +69,6 @@ targets:
       name: ml-api-adapter
       file: Chart.yaml
       key: $.dependencies[2].version
-      appversion: true
   chart-handler-notification:
     sourceid: ml-api-adapter
     kind: helmchart
@@ -88,6 +85,13 @@ targets:
       file: values.yaml
       key: $.sidecar.image.tag
       appversion: true
+  chart-handler-notification--common:
+    sourceid: common
+    kind: helmchart
+    spec:
+      name: ml-api-adapter/chart-handler-notification
+      file: Chart.yaml
+      key: $.dependencies[0].version
   chart-service:
     sourceid: ml-api-adapter
     kind: helmchart
@@ -103,4 +107,10 @@ targets:
       name: ml-api-adapter/chart-service
       file: values.yaml
       key: $.sidecar.image.tag
-      appversion: true
+  chart-service--common:
+    sourceid: common
+    kind: helmchart
+    spec:
+      name: ml-api-adapter/chart-service
+      file: Chart.yaml
+      key: $.dependencies[0].version

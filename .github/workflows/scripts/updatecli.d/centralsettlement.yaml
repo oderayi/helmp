@@ -42,7 +42,6 @@ targets:
       name: centralsettlement
       file: values.yaml
       key: $.centralsettlement-service.sidecar.image.tag
-      appversion: true
   centralsettlement-handler-deferredsettlement:
     sourceid: central-settlement
     kind: helmchart
@@ -58,7 +57,6 @@ targets:
       name: centralsettlement
       file: values.yaml
       key: $.centralsettlement-handler-deferredsettlement.sidecar.image.tag
-      appversion: true
   centralsettlement-handler-grosssettlement:
     sourceid: central-settlement
     kind: helmchart
@@ -74,7 +72,6 @@ targets:
       name: centralsettlement
       file: values.yaml
       key: $.centralsettlement-handler-grosssettlement.sidecar.image.tag
-      appversion: true
   centralsettlement-handler-rules:
     sourceid: central-settlement
     kind: helmchart
@@ -90,7 +87,6 @@ targets:
       name: centralsettlement
       file: values.yaml
       key: $.centralsettlement-handler-rules.sidecar.image.tag
-      appversion: true
   chart-service:
     sourceid: central-settlement
     kind: helmchart
@@ -106,4 +102,4 @@ targets:
       name: centralsettlement/chart-service
       file: values.yaml
       key: $.sidecar.image.tag
-      appversion: true
+  

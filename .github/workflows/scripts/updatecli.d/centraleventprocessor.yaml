@@ -7,6 +7,11 @@ sources:
       owner: mojaloop
       token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
       repository: central-event-processor
+  common:
+    kind: helmchart
+    spec: 
+      url: https://mojaloop.github.io/charts/repo
+      name: common
 
 conditions:
   docker-central-event-processor:
@@ -24,4 +29,11 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
+  common:
+    sourceid: common
+    kind: helmchart
+    spec:
+      name: centraleventprocessor
+      file: Chart.yaml
+      key: $.dependencies[0].version
   

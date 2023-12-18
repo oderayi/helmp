@@ -139,7 +139,7 @@ targets:
       file: values.yaml
       key: $.centralledger-handler-admin-transfer.sidecar.image.tag
       appversion: true
-  chart-handler-admin-transfer__root:
+  chart-handler-admin-transfer:
     sourceid: central-ledger
     kind: helmchart
     spec:
@@ -147,7 +147,7 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart-handler-admin-transfer__sidecar:
+  chart-handler-admin-transfer--sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:
@@ -155,7 +155,7 @@ targets:
       file: values.yaml
       key: $.sidecar.image.tag
       appversion: true
-  chart-handler-timeout__root:
+  chart-handler-timeout:
     sourceid: central-ledger
     kind: helmchart
     spec:
@@ -163,7 +163,7 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart-handler-timeout__sidecar:
+  chart-handler-timeout--sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:
@@ -171,7 +171,7 @@ targets:
       file: values.yaml
       key: $.sidecar.image.tag
       appversion: true
-  chart-handler-transfer-fulfil__root:
+  chart-handler-transfer-fulfil:
     sourceid: central-ledger
     kind: helmchart
     spec:
@@ -179,7 +179,7 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart-handler-transfer-fulfil__sidecar:
+  chart-handler-transfer-fulfil--sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:
@@ -187,7 +187,7 @@ targets:
       file: values.yaml
       key: $.sidecar.image.tag
       appversion: true
-  chart-handler-transfer-get__root:
+  chart-handler-transfer-get:
     sourceid: central-ledger
     kind: helmchart
     spec:
@@ -195,7 +195,7 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart-handler-transfer-get__sidecar:
+  chart-handler-transfer-get--sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:
@@ -203,7 +203,7 @@ targets:
       file: values.yaml
       key: $.sidecar.image.tag
       appversion: true
-  chart-handler-transfer-position__root:
+  chart-handler-transfer-position:
     sourceid: central-ledger
     kind: helmchart
     spec:
@@ -211,7 +211,7 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart-handler-transfer-position__sidecar:
+  chart-handler-transfer-position--sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:
@@ -219,7 +219,7 @@ targets:
       file: values.yaml
       key: $.sidecar.image.tag
       appversion: true
-  chart-handler-transfer-prepare__root:
+  chart-handler-transfer-prepare:
     sourceid: central-ledger
     kind: helmchart
     spec:
@@ -227,7 +227,7 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart-handler-transfer-prepare__sidecar:
+  chart-handler-transfer-prepare--sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:
@@ -235,7 +235,7 @@ targets:
       file: values.yaml
       key: $.sidecar.image.tag
       appversion: true
-  chart-service__root:
+  chart-service:
     sourceid: central-ledger
     kind: helmchart
     spec:
@@ -243,7 +243,7 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart-service__sidecar:
+  chart-service--sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:

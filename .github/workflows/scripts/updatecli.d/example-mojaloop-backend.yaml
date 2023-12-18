@@ -30,7 +30,7 @@ targets:
     kind: file
     spec:
       file: example-mojaloop-backend/Chart.yaml
-      matchpattern: '(nginx:) ([\d\.]+); (mysql:) ([\d\.]+); (kafka:) ([\d\.]+); (mongodb:) ([\d\.]+); (redis:) ([\d\.]+)'
+      matchpattern: '(nginx:) (v[\d\.]+); (mysql:) (v[\d\.]+); (kafka:) (v[\d\.]+); (mongodb:) (v[\d\.]+); (redis:) (v[\d\.]+)'
       replacepattern: '$1 $2; $3 {{ source "mysql" }}; $5 {{ source "kafka" }}; $7 {{ source "mongodb" }}; $9 {{ source "redis" }}'
   kafka:
     sourceid: kafka

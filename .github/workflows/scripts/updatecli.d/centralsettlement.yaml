@@ -91,7 +91,7 @@ targets:
       file: values.yaml
       key: $.centralsettlement-handler-rules.sidecar.image.tag
       appversion: true
-  chart-service__root:
+  chart-service:
     sourceid: central-settlement
     kind: helmchart
     spec:
@@ -99,7 +99,7 @@ targets:
       file: values.yaml
       key: $.image.tag
       appversion: true
-  chart-service__sidecar:
+  chart-service--sidecar:
     sourceid: event-sidecar
     kind: helmchart
     spec:

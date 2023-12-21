@@ -133,97 +133,97 @@ sources:
   #   spec:
   #     image: redis
 
-# conditions:
-#   docker-account-lookup-service:
-#     sourceid: account-lookup-service
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/account-lookup-service
-#   docker-als-oracle-pathfinder:
-#     sourceid: als-oracle-pathfinder
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/als-oracle-pathfinder
-#   docker-quoting-service:
-#     sourceid: quoting-service
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/quoting-service
-#   docker-ml-api-adapter:
-#     sourceid: ml-api-adapter
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/ml-api-adapter
-#   docker-central-ledger:
-#     sourceid: central-ledger
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/central-ledger
-#   docker-central-settlement:
-#     sourceid: central-settlement
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/central-settlement
-#   docker-transaction-requests-service:
-#     sourceid: transaction-requests-service
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/transaction-requests-service
-#   docker-auth-service:
-#     sourceid: auth-service
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/auth-service
-#   docker-als-consent-oracle:
-#     sourceid: als-consent-oracle
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/als-consent-oracle
-#   docker-thirdparty-api-svc:
-#     sourceid: thirdparty-api-svc
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/thirdparty-api-svc
-#   docker-sdk-scheme-adapter:
-#     sourceid: sdk-scheme-adapter
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/sdk-scheme-adapter
-#   docker-mojaloop-simulator:
-#     sourceid: mojaloop-simulator
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/mojaloop-simulator
-#   docker-thirdparty-sdk:
-#     sourceid: thirdparty-sdk
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/thirdparty-sdk
-#   docker-simulator:
-#     sourceid: simulator
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/simulator
-#   docker-bulk-api-adapter:
-#     sourceid: bulk-api-adapter
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/bulk-api-adapter
-#   docker-event-sidecar:
-#     sourceid: event-sidecar
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/event-sidecar
-#   docker-ml-testing-toolkit:
-#     sourceid: ml-testing-toolkit
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/ml-testing-toolkit
-#   docker-ml-testing-toolkit-ui:
-#     sourceid: ml-testing-toolkit-ui
-#     kind: dockerimage
-#     spec:
-#       image: mojaloop/ml-testing-toolkit-ui
+conditions:
+  docker-account-lookup-service:
+    sourceid: account-lookup-service
+    kind: dockerimage
+    spec:
+      image: mojaloop/account-lookup-service
+  docker-als-oracle-pathfinder:
+    sourceid: als-oracle-pathfinder
+    kind: dockerimage
+    spec:
+      image: mojaloop/als-oracle-pathfinder
+  docker-quoting-service:
+    sourceid: quoting-service
+    kind: dockerimage
+    spec:
+      image: mojaloop/quoting-service
+  docker-ml-api-adapter:
+    sourceid: ml-api-adapter
+    kind: dockerimage
+    spec:
+      image: mojaloop/ml-api-adapter
+  docker-central-ledger:
+    sourceid: central-ledger
+    kind: dockerimage
+    spec:
+      image: mojaloop/central-ledger
+  docker-central-settlement:
+    sourceid: central-settlement
+    kind: dockerimage
+    spec:
+      image: mojaloop/central-settlement
+  docker-transaction-requests-service:
+    sourceid: transaction-requests-service
+    kind: dockerimage
+    spec:
+      image: mojaloop/transaction-requests-service
+  docker-auth-service:
+    sourceid: auth-service
+    kind: dockerimage
+    spec:
+      image: mojaloop/auth-service
+  docker-als-consent-oracle:
+    sourceid: als-consent-oracle
+    kind: dockerimage
+    spec:
+      image: mojaloop/als-consent-oracle
+  docker-thirdparty-api-svc:
+    sourceid: thirdparty-api-svc
+    kind: dockerimage
+    spec:
+      image: mojaloop/thirdparty-api-svc
+  docker-sdk-scheme-adapter:
+    sourceid: sdk-scheme-adapter
+    kind: dockerimage
+    spec:
+      image: mojaloop/sdk-scheme-adapter
+  docker-mojaloop-simulator:
+    sourceid: mojaloop-simulator
+    kind: dockerimage
+    spec:
+      image: mojaloop/mojaloop-simulator
+  docker-thirdparty-sdk:
+    sourceid: thirdparty-sdk
+    kind: dockerimage
+    spec:
+      image: mojaloop/thirdparty-sdk
+  docker-simulator:
+    sourceid: simulator
+    kind: dockerimage
+    spec:
+      image: mojaloop/simulator
+  docker-bulk-api-adapter:
+    sourceid: bulk-api-adapter
+    kind: dockerimage
+    spec:
+      image: mojaloop/bulk-api-adapter
+  docker-event-sidecar:
+    sourceid: event-sidecar
+    kind: dockerimage
+    spec:
+      image: mojaloop/event-sidecar
+  docker-ml-testing-toolkit:
+    sourceid: ml-testing-toolkit
+    kind: dockerimage
+    spec:
+      image: mojaloop/ml-testing-toolkit
+  docker-ml-testing-toolkit-ui:
+    sourceid: ml-testing-toolkit-ui
+    kind: dockerimage
+    spec:
+      image: mojaloop/ml-testing-toolkit-ui
 
 targets:
   appVersion-ml-api-adapter:

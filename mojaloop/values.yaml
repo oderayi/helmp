@@ -7758,7 +7758,6 @@ thirdparty:
                   }
                 },
                 "redis": {
-                  ## Host is managed by environment variables
                   "port": 6379,
                   "timeout": 100
                 },
@@ -8515,7 +8514,7 @@ thirdparty:
       #   blah blah blah
       #   -----END PUBLIC KEY-----
 
-    defaults: &defaults
+    defaults:
       # Changes to this object in the parent chart, for example 'mojaloop-simulator.defaults' will be
       # applied to all simulators deployed by this child chart.
       config:
@@ -8949,7 +8948,6 @@ thirdparty:
                 }
               },
               "redis": {
-                ## Host is managed by environment variables
                 "port": 6379,
                 "timeout": 100
               },

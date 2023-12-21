@@ -1,4 +1,4 @@
-name: mojaloop
+name: mojaloop-bulk
 
 sources:
   bulk-api-adapter:

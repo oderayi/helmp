@@ -102,7 +102,7 @@ targets:
     sourceid: common
     kind: helmchart
     spec:
-      name: bulk-centralledger/chart-handler-bulk-prepare-prepare
+      name: bulk-centralledger/chart-handler-bulk-transfer-prepare
       file: Chart.yaml
       key: $.dependencies[0].version
   chart-handler-bulk-transfer-processing:

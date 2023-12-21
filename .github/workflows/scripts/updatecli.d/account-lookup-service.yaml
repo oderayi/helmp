@@ -48,14 +48,14 @@ targets:
     kind: file
     spec:
       file: account-lookup-service/Chart.yaml
-      matchpattern: '(account-lookup-service:) (v[\d\.]+)'
+      matchpattern: '(account-lookup-service:) (v[\d\.]+)(-snapshot(\.\d+)?)?'
       replacepattern: '$1 {{ source "account-lookup-service" }}'
   appVersion-als-oracle-pathfinder:
     sourceid: als-oracle-pathfinder
     kind: file
     spec:
       file: account-lookup-service/Chart.yaml
-      matchpattern: '(als-oracle-pathfinder:) (v[\d\.]+)'
+      matchpattern: '(als-oracle-pathfinder:) (v[\d\.]+)(-snapshot(\.\d+)?)?'
       replacepattern: '$1 {{ source "als-oracle-pathfinder" }}'
   account-lookup-service:
     sourceid: account-lookup-service

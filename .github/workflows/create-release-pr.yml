@@ -50,7 +50,7 @@ jobs:
           #  run: |
           #    python scripts/chart_bumper.py
           #    rm -f manifest.yaml
-        run: updatecli apply --experimental
+        run: updatecli apply ---config ./github/workflows/manifests
         # we expect this step to exit with non-zero exit code, so we need to set continue-on-error to true
         continue-on-error: true
       

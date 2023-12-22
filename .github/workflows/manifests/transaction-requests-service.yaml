@@ -6,7 +6,7 @@ sources:
     spec:
       owner: mojaloop
       token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
-      repository: trasaction-requests-service
+      repository: transaction-requests-service
   event-sidecar:
     kind: githubrelease
     spec:

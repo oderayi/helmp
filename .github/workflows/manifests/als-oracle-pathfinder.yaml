@@ -21,7 +21,7 @@ conditions:
       image: mojaloop/als-oracle-pathfinder
 
 targets:
-  root:
+  als-oracle-pathfinder:
     sourceid: als-oracle-pathfinder
     kind: helmchart
     spec:

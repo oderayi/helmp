@@ -21,7 +21,7 @@ conditions:
       image: mojaloop/central-event-processor
 
 targets:
-  root:
+  central-event-processor:
     sourceid: central-event-processor
     kind: helmchart
     spec:

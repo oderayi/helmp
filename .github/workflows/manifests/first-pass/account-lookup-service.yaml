@@ -24,11 +24,6 @@ sources:
     spec: 
       url: https://mojaloop.github.io/charts/repo
       name: common
-  chart-service:
-    kind: helmchart
-    spec: 
-      url: file://./account-lookup-service
-      name: account-lookup-service
   
 conditions:
   docker-account-lookup-service:
@@ -83,16 +78,6 @@ targets:
       name: account-lookup-service
       file: values.yaml
       key: $.als-oracle-pathfinder.image.tag
-  Chart.yaml--chart-service:
-    sourceid: chart-service
-    kind: helmchart
-    spec:
-      name: account-lookup-service
-      file: Chart.yaml
-      key: $.dependencies[0].version
-    transformers:
-      - addprefix: '">= '
-      - addsuffix: '"'
   common:
     sourceid: common
     kind: helmchart

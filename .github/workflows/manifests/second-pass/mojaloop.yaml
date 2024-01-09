@@ -191,7 +191,7 @@ targets:
       - addprefix: '">= '
       - addsuffix: '"'
   ml-ttk-test-setup:
-    sourceid: ml-testing-toolkit
+    sourceid: ml-testing-toolkit-cli
     kind: helmchart
     spec:
       name: mojaloop

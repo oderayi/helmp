@@ -1,45 +1,99 @@
-name: Upgrade helm charts minor versions
- 
-on: workflow_dispatch
- 
+# NOTES:
+# - GitHub Actions must be explicitly allowed to create pull requests in this repository. 
+#   This setting can be found in a repository's settings under Actions > General > Workflow permissions. 
+# - A secret `CPR_TOKEN` (permissions: `contents: write` and `pull-requests: write`) needs to be created in repository secrets. 
+#   This token is used by the `create-pull-request` action to create the pull request.
+
+name: Create release PR
+
+on: 
+    workflow_dispatch:
+    # THIS IS TEMPORARY TO ALLOW WORKFLOW RUN WITHOUT MERGING
+    # pull_request:
+
 jobs:
- upgrade-helm-charts:
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout
-       uses: actions/checkout@v2
-       with:
-         fetch-depth: 0
- 
-     - name: Set up Helm
-       uses: azure/setup-helm@v1
-       with:
-         version: v3.7.2
- 
-     - uses: actions/setup-python@v2
-       with:
-         python-version: 3.7
+  create_release_pr:
+    if: '!github.event.pull_request.draft'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 1
+
+      - name: Set up Helm
+        id: setup-helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.13.3
+
+      - name: Install UpdateCLI
+        id: install-updatecli
+        run: |
+          curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
+          sudo apt install /tmp/updatecli_amd64.deb
       
-     - name: install pyaml
-       run: |
-         pip3 install pyaml==21.10.1
- 
-     - name: install updateCli
-       run: |
-         curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
-         sudo apt install /tmp/updatecli_amd64.deb
- 
-     - name: Run chart bumper script
-       run: |
-         python scripts/chart_bumper.py
-         rm -f manifest.yaml
- 
-     - name: Create Pull Request
-       uses: peter-evans/create-pull-request@v4
-       with:
-         commit-message: "feat: upgrade helm charts"
-         title: "chore: upgrade helm charts minor versions"
-         body: |
-           Automatic upgrade of helm chart minor versions using https://github.com/updatecli/updatecli
-         branch: upgrade-helm-charts-minors
-         base: main
+      - name: Upgrade chart dependencies (first pass)
+        id: upgrade-chart-dependencies-first-pass
+        run: updatecli apply --config .github/workflows/manifests/first-pass
+
+      # update chart repositories for the second pass run
+      - name: Rebuild charts
+        id: rebuild-charts
+        run: ./update-chart-dep.sh
+      
+      # generate local chart indexes (i.e index.yaml) for each top-level chart directory
+      # for the second pass run
+      - name: Generate local chart index
+        id: generate-local-chart-index
+        run: |
+          find . -maxdepth 1 -type d -not -path '*/\.*' | sed 's/^\.\///g' | xargs -I {} helm repo index {}
+      
+      # the second-pass is needed to update locally refrenced charts
+      # this requires generation of local chart indexes (i.e index.yaml) for each top-level chart directory
+      - name: Upgrade chart dependencies (second pass)
+        id: upgrade-chart-dependencies-second-pass
+        run: updatecli apply --config .github/workflows/manifests/second-pass
+      
+      # update chart repositories for the third pass run
+      - name: Rebuild charts
+        id: rebuild-charts-2
+        run: ./update-chart-dep.sh
+      
+      # update local chart indexes (i.e index.yaml) for each top-level chart directory
+      - name: Generate local chart index
+        id: generate-local-chart-index-2
+        run: |
+          find . -maxdepth 1 -type d -not -path '*/\.*' | sed 's/^\.\///g' | xargs -I {} helm repo index {}
+      
+      # the third pass is a re-run of the second pass to update the charts that depend on the charts that were updated in the second pass
+      - name: Upgrade chart dependencies (second pass)
+        id: upgrade-chart-dependencies-third-pass
+        run: updatecli apply --config .github/workflows/manifests/second-pass
+
+      # step: detect breaking changes (default.json changes, migration scripts changes, 
+      #       presence of phrase "BREAKING CHANGE" in changelogs, etc.)
+
+      # step: gather changelogs and generate release note
+
+      # step: try linting and updating charts
+
+      # step: deploy charts to staging environment
+
+        # NOTE: For this action to work GitHub Actions must be explicitly allowed to create pull requests.
+        # This setting can be found in a repository's settings under Actions > General > Workflow permissions.
+      - name: Create Pull Request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          # NOTE: This token should have permissions (`contents: write` and `pull-requests: write`)
+          token: ${{ secrets.CPR_TOKEN }} # TODO: Find better name for this token
+          commit-message: "chore: upgrade helm chart depdenencies"
+          title: "[auto] feat: release candidate"
+          body: |
+            Release candidate for the next version of the helm charts.
+          branch: release/release-candidate-${{ github.run_id }}
+          base: master
+          draft: true

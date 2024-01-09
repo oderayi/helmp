@@ -37,7 +37,7 @@ jobs:
       
       - name: Upgrade chart dependencies (first pass)
         id: upgrade-chart-dependencies-first-pass
-        run: updatecli apply ---config ./github/workflows/manifests/first-pass
+        run: updatecli apply --config .github/workflows/manifests/first-pass
 
       # update chart repositories for the second pass run
       - name: Rebuild charts
@@ -55,7 +55,7 @@ jobs:
       # this requires generation of local chart indexes (i.e index.yaml) for each top-level chart directory
       - name: Upgrade chart dependencies (second pass)
         id: upgrade-chart-dependencies-second-pass
-        run: updatecli apply ---config ./github/workflows/manifests/second-pass
+        run: updatecli apply --config .github/workflows/manifests/second-pass
       
       # update chart repositories for the third pass run
       - name: Rebuild charts
@@ -71,7 +71,7 @@ jobs:
       # the third pass is a re-run of the second pass to update the charts that depend on the charts that were updated in the second pass
       - name: Upgrade chart dependencies (second pass)
         id: upgrade-chart-dependencies-third-pass
-        run: updatecli apply ---config ./github/workflows/manifests/second-pass
+        run: updatecli apply --config .github/workflows/manifests/second-pass
 
       # step: detect breaking changes (default.json changes, migration scripts changes, 
       #       presence of phrase "BREAKING CHANGE" in changelogs, etc.)

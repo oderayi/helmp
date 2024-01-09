@@ -8848,6 +8848,7 @@ thirdparty:
               #     ..
               # outbound: *inbound
               inbound: &inbound
+              # DO NOT REMOVE COMMENT
               outbound: *inbound
             jws:
               # Use the privKeySecretName field if you would like to supply a JWS private key external
@@ -12859,13 +12860,14 @@ ml-testing-toolkit:
       user_config.json: {
         "DEFAULT_ENVIRONMENT_FILE_NAME": "hub-k8s-default-environment.json"
       }
-      system_config.json: {
-        ## Uncomment for Socket IO configs for UI to Backend interactions. This may help if long running Test-Collections time-out.
-        #  "SOCKET_IO_ENGINE_OPTIONS": {
-        #     "pingInterval": 25000,
-        #     "pingTimeout": 300000
-        # }
-      }
+      # system_config.json: {
+      #   ## Uncomment for Socket IO configs for UI to Backend interactions. This may help if long running Test-Collections time-out.
+      #   #  "SOCKET_IO_ENGINE_OPTIONS": {
+      #   #     "pingInterval": 25000,
+      #   #     "pingTimeout": 300000
+      #   # }
+      # }
+      system_config.json: {}
       ## We can specify the files and folders here those we want to override in the TTK `spec_files` directory.
       ## For example, you can specify user_config.json, system_config.json ...etc
       ## Files inside the folders can be defined with full path of the files with slashes replaced by two underscores `__`.

@@ -35,43 +35,26 @@ jobs:
           curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
           sudo apt install /tmp/updatecli_amd64.deb
       
+      # first pass - update with github releases and published helm charts
       - name: Upgrade chart dependencies (first pass)
         id: upgrade-chart-dependencies-first-pass
         run: updatecli apply --config .github/workflows/manifests/first-pass
-
-      # update chart repositories for the second pass run
-      - name: Rebuild charts
-        id: rebuild-charts
-        run: ./update-chart-dep.sh
       
-      # generate local chart indexes (i.e index.yaml) for each top-level chart directory
-      # for the second pass run
-      - name: Generate local chart index
-        id: generate-local-chart-index
+      # second pass - update with locally referenced charts
+      # runs the second-pass manifests repeatedly until no changes are detected
+      - name: Update locally referenced charts
+        id: update-locally-referenced-charts
         run: |
-          find . -maxdepth 1 -type d -not -path '*/\.*' | sed 's/^\.\///g' | xargs -I {} helm repo index {}
-      
-      # the second-pass is needed to update locally refrenced charts
-      # this requires generation of local chart indexes (i.e index.yaml) for each top-level chart directory
-      - name: Upgrade chart dependencies (second pass)
-        id: upgrade-chart-dependencies-second-pass
-        run: updatecli apply --config .github/workflows/manifests/second-pass
-      
-      # update chart repositories for the third pass run
-      - name: Rebuild charts
-        id: rebuild-charts-2
-        run: ./update-chart-dep.sh
-      
-      # update local chart indexes (i.e index.yaml) for each top-level chart directory
-      - name: Generate local chart index
-        id: generate-local-chart-index-2
-        run: |
-          find . -maxdepth 1 -type d -not -path '*/\.*' | sed 's/^\.\///g' | xargs -I {} helm repo index {}
-      
-      # the third pass is a re-run of the second pass to update the charts that depend on the charts that were updated in the second pass
-      - name: Upgrade chart dependencies (second pass)
-        id: upgrade-chart-dependencies-third-pass
-        run: updatecli apply --config .github/workflows/manifests/second-pass
+            > output.log # create the log file, overwrite/empty it if it already exists
+            pass_count=0
+            # repeatedly run the second-pass manifests until no changes are detected
+            while ! (grep -q "* Changed:	0" output.log); do
+                echo -e "\nUpdating charts ... pass: ((++pass_count))\n"
+                ./update-charts-dep.sh 
+                find . -maxdepth 1 -type d -not -path '*/\.*' | sed 's/^\.\///g' | xargs -I {} helm repo index {} 
+                updatecli apply --config .github/workflows/manifests/second-pass |& tee output.log
+                sleep 5
+            done
 
       # step: detect breaking changes (default.json changes, migration scripts changes, 
       #       presence of phrase "BREAKING CHANGE" in changelogs, etc.)

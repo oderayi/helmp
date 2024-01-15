@@ -33,7 +33,9 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch == 'master' ? 'master' : github.head_ref }}
+            if: inputs.branch == 'master'
+            ref: master
+            else ref: ${{ github.head_ref }}
           fetch-depth: 1
 
       - name: Set up Helm

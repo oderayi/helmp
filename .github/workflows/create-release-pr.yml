@@ -18,7 +18,7 @@ on:
           default: 'master'
           options:
             - master
-            - ${{ github.head_ref }}
+            - $default-branch
             
     # Disable the following line to enable the workflow on every push to a pull request
     # This is useful for testing the workflow before merging to master
@@ -33,9 +33,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
         with:
-            if: inputs.branch == 'master'
-            ref: master
-            else ref: ${{ github.head_ref }}
+          ref: ${{ inputs.branch }}
           fetch-depth: 1
 
       - name: Set up Helm

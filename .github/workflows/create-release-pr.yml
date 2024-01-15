@@ -52,7 +52,7 @@ jobs:
       - name: Upgrade chart dependencies (first pass)
         id: upgrade-chart-dependencies-first-pass
         env:
-          UPDATECLI_GITHUB_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
         run: updatecli apply --config .github/workflows/manifests/first-pass
       
       # second pass - update with locally referenced charts
@@ -60,7 +60,7 @@ jobs:
       - name: Update locally referenced charts (second pass)
         id: update-locally-referenced-charts-second-pass
         env:
-          UPDATECLI_GITHUB_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
         run: |
             # create the log file, overwrite/empty it if it already exists
             > output.log 

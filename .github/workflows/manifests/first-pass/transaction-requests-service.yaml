@@ -5,13 +5,13 @@ sources:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
       repository: transaction-requests-service
   event-sidecar:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
       repository: event-sidecar
   common:
     kind: helmchart

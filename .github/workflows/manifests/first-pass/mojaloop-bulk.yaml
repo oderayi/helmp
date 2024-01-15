@@ -5,13 +5,13 @@ sources:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
       repository: bulk-api-adapter
   central-ledger:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
       repository: central-ledger
   common:
     kind: helmchart

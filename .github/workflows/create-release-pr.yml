@@ -18,7 +18,8 @@ on:
           default: 'master'
           options:
             - master
-            - '{{github.event.pull_request.head.ref}}'
+            - ${{ github.head_ref }}
+            
     # Disable the following line to enable the workflow on every push to a pull request
     # This is useful for testing the workflow before merging to master
     # pull_request 
@@ -32,7 +33,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch }}
+          ref: ${{ inputs.branch == 'master' ? 'master' : github.head_ref }}
           fetch-depth: 1
 
       - name: Set up Helm

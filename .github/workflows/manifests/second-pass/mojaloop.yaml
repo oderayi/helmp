@@ -186,7 +186,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[11].version
+      key: $.dependencies[12].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -196,7 +196,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[12].version
+      key: $.dependencies[13].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -206,7 +206,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[13].version
+      key: $.dependencies[14].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -216,7 +216,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[14].version
+      key: $.dependencies[15].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -226,7 +226,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[15].version
+      key: $.dependencies[16].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -236,7 +236,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[16].version
+      key: $.dependencies[17].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -246,7 +246,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[17].version
+      key: $.dependencies[18].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -256,7 +256,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[18].version
+      key: $.dependencies[19].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -266,7 +266,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[19].version
+      key: $.dependencies[20].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -276,7 +276,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[20].version
+      key: $.dependencies[21].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -286,7 +286,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[21].version
+      key: $.dependencies[22].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -296,7 +296,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[22].version
+      key: $.dependencies[23].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -306,7 +306,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[23].version
+      key: $.dependencies[24].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'
@@ -316,7 +316,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[24].version
+      key: $.dependencies[25].version
     transformers:
       - addprefix: '">= '
       - addsuffix: '"'

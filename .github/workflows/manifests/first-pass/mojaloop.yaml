@@ -5,121 +5,121 @@ sources:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: account-lookup-service
   als-oracle-pathfinder:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: als-oracle-pathfinder
   quoting-service:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: quoting-service
   ml-api-adapter:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: ml-api-adapter
   central-ledger:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: central-ledger
   central-settlement:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: central-settlement
   transaction-requests-service:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: transaction-requests-service
   auth-service:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: auth-service
   als-consent-oracle:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: als-consent-oracle
   thirdparty-api-svc:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: thirdparty-api-svc
   sdk-scheme-adapter:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: sdk-scheme-adapter
   mojaloop-simulator:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: mojaloop-simulator
   thirdparty-sdk:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: thirdparty-sdk
   simulator:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: simulator
   bulk-api-adapter:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: bulk-api-adapter
   event-sidecar:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: event-sidecar
   ml-testing-toolkit:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: ml-testing-toolkit
   ml-testing-toolkit-ui:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: ml-testing-toolkit-ui
   ml-testing-toolkit-test-cases:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: testing-toolkit-test-cases
   ml-testing-toolkit-test-cases-trimmed:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: testing-toolkit-test-cases
     transformers:
       - trimprefix: v
@@ -337,7 +337,7 @@ targets:
     spec:
       name: mojaloop
       file: Chart.yaml
-      key: $.dependencies[25].version
+      key: $.dependencies[11].version
   account-lookup-service:
     sourceid: account-lookup-service
     kind: helmchart

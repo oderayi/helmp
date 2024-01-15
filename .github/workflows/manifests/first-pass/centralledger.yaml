@@ -5,13 +5,13 @@ sources:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: central-ledger
   event-sidecar:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: event-sidecar
 
 conditions:

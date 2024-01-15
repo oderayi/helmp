@@ -5,37 +5,37 @@ sources:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: auth-service
   als-consent-oracle:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: als-consent-oracle
   thirdparty-api-svc:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: thirdparty-api-svc
   sdk-scheme-adapter:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: sdk-scheme-adapter
   mojaloop-simulator:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: mojaloop-simulator
   thirdparty-sdk:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: thirdparty-sdk
   common:
     kind: helmchart

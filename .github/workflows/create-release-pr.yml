@@ -1,15 +1,18 @@
 # NOTES:
 # - GitHub Actions must be explicitly allowed to create pull requests in this repository. 
-#   This setting can be found in a repository's settings under Actions > General > Workflow permissions. 
-# - A secret `CPR_TOKEN` (permissions: `contents: write` and `pull-requests: write`) needs to be created in repository secrets. 
-#   This token is used by the `create-pull-request` action to create the pull request.
+#   This setting can be found in the repository's settings under Actions > General > Workflow permissions. 
+# - A repository secret `AUTO_RELEASE_TOKEN` (permissions: `contents: write`, `pull-requests: write`, `repositories: read`) needs to be created. 
+#   The secret should contain a github access token with the permissions specified above.
+#   The secret is used by the `create-pull-request` action to create the pull request and `updatecli` to access all updateable repositories.
+#   The secret can be created at https://github.com/mojaloop/helm/settings/secrets/actions
 
 name: Create release PR
 
 on: 
     workflow_dispatch:
-    # THIS IS TEMPORARY TO ALLOW WORKFLOW RUN WITHOUT MERGING
-    # pull_request:
+    # Disable the following line to enable the workflow on every push to a pull request
+    # This is useful for testing the workflow before merging to master
+    # pull_request 
 
 jobs:
   create_release_pr:
@@ -42,14 +45,15 @@ jobs:
       
       # second pass - update with locally referenced charts
       # runs the second-pass manifests repeatedly until no changes are detected
-      - name: Update locally referenced charts
-        id: update-locally-referenced-charts
+      - name: Update locally referenced charts (second pass)
+        id: update-locally-referenced-charts-second-pass
         run: |
-            > output.log # create the log file, overwrite/empty it if it already exists
+            # create the log file, overwrite/empty it if it already exists
+            > output.log 
             pass_count=0
             # repeatedly run the second-pass manifests until no changes are detected
             while ! (grep -q "* Changed:	0" output.log); do
-                echo -e "\nUpdating charts ... pass: ((++pass_count))\n"
+                echo -e "\nUpdating charts ... pass: $((++pass_count))\n"
                 ./update-charts-dep.sh 
                 find . -maxdepth 1 -type d -not -path '*/\.*' | sed 's/^\.\///g' | xargs -I {} helm repo index {} 
                 updatecli apply --config .github/workflows/manifests/second-pass |& tee output.log
@@ -72,7 +76,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           # NOTE: This token should have permissions (`contents: write` and `pull-requests: write`)
-          token: ${{ secrets.CPR_TOKEN }} # TODO: Find better name for this token
+          token: ${{ secrets.AUTO_RELEASE_TOKEN }} 
           commit-message: "chore: upgrade helm chart depdenencies"
           title: "[auto] feat: release candidate"
           body: |

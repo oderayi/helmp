@@ -10,19 +10,19 @@ sources:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: ml-testing-toolkit
   ml-testing-toolkit-ui:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: ml-testing-toolkit-ui
   sdk-scheme-adapter:
     kind: githubrelease
     spec:
       owner: mojaloop
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      token: '{{ requiredEnv "AUTO_RELEASE_TOKEN" }}'
       repository: sdk-scheme-adapter
   common:
     kind: helmchart

@@ -18,7 +18,7 @@ on:
           default: 'master'
           options:
             - master
-            - ${{ github.head_ref }}
+            - '{{github.event.pull_request.head.ref}}'
     # Disable the following line to enable the workflow on every push to a pull request
     # This is useful for testing the workflow before merging to master
     # pull_request 

@@ -12,13 +12,10 @@ on:
     workflow_dispatch:
       inputs:
         branch:
-          type: choice
-          description: 'Branch to create release PR from'
+          type: string
+          description: 'Branch to create release PR from (e.g. master, empty for PR branch)'
           required: true
           default: 'master'
-          options:
-            - master
-            - current
             
     # Disable the following line to enable the workflow on every push to a pull request
     # This is useful for testing the workflow before merging to master
@@ -33,7 +30,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
         with:
-          # ref: ${{ inputs.branch }}
+          ref: ${{ inputs.branch }}
           fetch-depth: 1
 
       - name: Set up Helm

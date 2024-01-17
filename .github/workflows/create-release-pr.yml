@@ -14,8 +14,12 @@ on:
         branch:
           type: string
           description: 'Branch to create release PR from (e.g. master, empty for PR branch)'
-          required: false
+          required: true
           default: 'master'
+        last_release_tag:
+          type: string
+          description: 'Last release tag (e.g. v1.0.0)'
+          required: true
 
 jobs:
   create_release_pr:
@@ -46,12 +50,17 @@ jobs:
         id: update-chart-dependencies
         env:
           AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-        run: ./.github/workflows/scripts/update-charts.sh
-
-      # step: detect breaking changes (default.json changes, migration scripts changes, 
+        run: .github/workflows/scripts/update-charts.sh
+      
+      # step: generate release note
+      # - gather changelogs and generate release note
+      # - detect breaking changes (default.json changes, migration scripts changes, 
       #       presence of phrase "BREAKING CHANGE" in changelogs, etc.)
-
-      # step: gather changelogs and generate release note
+      - name: Generate release note
+        id: generate-release-note
+        env:
+          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+        run: .github/workflows/scripts/generate-release-note.sh
 
       # step: try linting and updating charts
 

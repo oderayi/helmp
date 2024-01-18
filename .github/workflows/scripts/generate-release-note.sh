@@ -76,6 +76,7 @@ done < "current-tags.log"
 # Generate the github changelog
 # We store the changelogs in a temporary directory
 dir=".tmp-changelogs"
+
 # If the directory exists, remove its contents
 if [ -d "$dir" ]; then
     rm -rf "$dir"/*
@@ -98,7 +99,11 @@ do
     fi
 done
 
-# Generate release note
+# Generate release note.
+# We use a template (.github/workflows/templates/release-note-template.md) to generate the release note
+# The template contains placeholders that are replaced with the PR titles from the changelogs and other information
+
+
 
 
 

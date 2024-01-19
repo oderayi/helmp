@@ -11,10 +11,6 @@ usage() {
     echo "generate-release-note.sh release_version [last_release_tag]"
 }
 
-function escape_sed {
-  echo "$1" | sed -e 's/[\/&]/\\&/g'
-}
-
 breaking_changes() {
     # Loop over each json file in .tmp/changelogs directory
     # Extract the pull request titles from the json file into an associative array of array indexed by the file basename
@@ -63,6 +59,7 @@ application_versions() {
     application_versions=""
     line_number=0
 
+    # List services that have changed first
     for repository in "${!current_tags[@]}"
     do
         if [[ $repository == mojaloop* ]]
@@ -74,6 +71,7 @@ application_versions() {
         fi
     done
 
+    # Add services that have not changed below
     for repository in "${!current_tags[@]}"
     do
         if [[ $repository == mojaloop* ]]
@@ -166,13 +164,22 @@ else
     last_release_tag=$2
 fi
 
-# Extract and store repository name and tag in mojaloop's values.yaml file
-helm show values mojaloop | grep -E 'repository:|tag:' | awk '{print $1 $2}' > $dir/tags/current-tags.log
+# Extract and store repository name and tag in all values.yaml files
+for chart_dir in */; do
+  if [[ $chart_dir != .* ]] && [[ -f "${chart_dir}Chart.yaml" ]]; then
+    helm show values "$chart_dir" | grep -E 'repository:|tag:' | awk '{print $1 $2}' >> "${dir}/tags/current-tags.log"
+  fi
+done
 
-# Checkout out last release tag and extract repository name and tag in its mojaloop's values.yaml file
+# Checkout out last release tag and extract repository name and tag in its all values.yaml files
 git stash # stash current changes
 git switch --detach $last_release_tag
-helm show values mojaloop | grep -E 'repository:|tag:' | awk '{print $1 $2}' > $dir/tags/last-release-tags.log
+# helm show values mojaloop | grep -E 'repository:|tag:' | awk '{print $1 $2}' > $dir/tags/last-release-tags.log
+for chart_dir in */; do
+  if [[ $chart_dir != .* ]] && [[ -f "${chart_dir}Chart.yaml" ]]; then
+    helm show values "$chart_dir" | grep -E 'repository:|tag:' | awk '{print $1 $2}' >> "${dir}/tags/last-release-tags.log"
+  fi
+done
 
 # Checkout back to current branch
 git checkout $current_branch

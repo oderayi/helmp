@@ -4,6 +4,23 @@
 # Environment variables: AUTO_RELEASE_TOKEN
 
 ######################
+# Global variables   #
+######################
+declare -A last_release_tags
+declare -A current_tags
+excluded_charts=(
+    "finance-portal"
+    "finance-portal-settlement-management"
+    "forensicloggingsidecar"
+    "kube-system"
+    "ml-operator"
+    "centralenduserregistry"
+    "centralkms"
+    "example-mojaloop-bakend"
+    "monitoring"
+)
+
+######################
 # Helper functions   #
 ######################
 usage() {
@@ -20,7 +37,9 @@ breaking_changes() {
     for file in $dir/changelogs/*.json
     do
         repository=$(basename $file | cut -d'.' -f1)
-        breaking_changes[$repository]=$(cat $file | jq -r '.files[] | select(.filename | contains("default.json") or contains("migration")) | "  * \(.filename): (\(.blob_url))"')
+        breaking_files=$(cat $file | jq -r '.files[] | select(.filename | contains("default.json", "migration")) | "  * \(.filename): (\(.blob_url))"')
+        breaking_commits=$(cat $file | jq -r '.commits[] | select(.commit.message | contains("BREAKING CHANGE")) | .commit.message = (.commit.message | split("\n")[0]) |  "  * \(.commit.message): (\(.commit.url))"')
+        breaking_changes[$repository]=$(echo -e "$breaking_files\n$breaking_commits")
     done
 
     # Generate breaking changes section
@@ -32,8 +51,7 @@ breaking_changes() {
     do
         if [[ ${breaking_changes[$repository]} ]]
         then
-            breaking_changes_section+="* $repository: <br>"
-            breaking_changes_section+="${breaking_changes[$repository]}"
+            breaking_changes_section+=$(echo -e "\n### $repository\n${breaking_changes[$repository]}")
         fi
     done
 
@@ -41,18 +59,29 @@ breaking_changes() {
 }
 
 release_summary_points() {
-    # TODO: Sumarrize the release note into 3-5 points
-    echo "<Release summary points go here...>"
+    echo "_Release summary points go here..._"
 }
 
 new_features() {
-    # TODO: Group PRs by their epics 
-    echo ""
+    new_features=""
+    for file in $dir/changelogs/*.json
+    do
+        repository=$(basename $file | cut -d'.' -f1)
+        new_features+=$(cat $file |  jq -r '.commits[].commit | select(.message | startswith("feat")) .message | split("\n")[0] as $pr_title | "* \($pr_title)"' | sort -u)
+    done
+
+    echo "$new_features"
 }
 
 bug_fixes() {
-    # TODO: Add logic here
-    echo ""
+    bug_fixes=""
+    for file in $dir/changelogs/*.json
+    do
+        repository=$(basename $file | cut -d'.' -f1)
+        bug_fixes+=$(cat $file |  jq -r '.commits[].commit | select(.message | startswith("fix")) .message | split("\n")[0] as $pr_title | "* \($pr_title)"' | sort -u)
+    done
+
+    echo "$bug_fixes"
 }
 
 application_versions() {
@@ -66,7 +95,8 @@ application_versions() {
         then
             if [[ ${current_tags[$repository]} != ${last_release_tags[$repository]} ]]
             then
-                application_versions+="$((++line_number)). $repository: ${last_release_tags[$repository]} -> [${current_tags[$repository]}](https://github.com/$repository/releases/${current_tags[$repository]}) ([Compare](https://github.com/$repository/compare/${last_release_tags[$repository]}...${current_tags[$repository]})) <br>"
+                line_number=$(( line_number+1 ))
+                application_versions+=$(echo -e "\n$line_number. $repository: ${last_release_tags[$repository]} -> [${current_tags[$repository]}](https://github.com/$repository/releases/${current_tags[$repository]}) ([Compare](https://github.com/$repository/compare/${last_release_tags[$repository]}...${current_tags[$repository]}))")
             fi
         fi
     done
@@ -78,7 +108,8 @@ application_versions() {
         then
             if [[ ${current_tags[$repository]} == ${last_release_tags[$repository]} ]]
             then
-                application_versions+="$((++line_number)). $repository: [${current_tags[$repository]}](https://github.com/$repository/releases/${current_tags[$repository]}) <br>"
+                line_number=$((line_number+1))
+                application_versions+=$(echo -e "\n$line_number. $repository: [${current_tags[$repository]}](https://github.com/$repository/releases/${current_tags[$repository]})")
             fi
         fi
     done
@@ -165,20 +196,21 @@ else
 fi
 
 # Extract and store repository name and tag in all values.yaml files
-for chart_dir in */; do
-  if [[ $chart_dir != .* ]] && [[ -f "${chart_dir}Chart.yaml" ]]; then
-    helm show values "$chart_dir" | grep -E 'repository:|tag:' | awk '{print $1 $2}' >> "${dir}/tags/current-tags.log"
-  fi
+find . -type d -name '[!.]*' -exec test -e "{}/Chart.yaml" ';' -print | while read chart_dir; do
+    base_chart_dir=$(echo $chart_dir | cut -d'/' -f2)
+    if [[ ! " ${excluded_charts[@]} " =~ " ${base_chart_dir} " ]]; then
+        helm show values "$chart_dir" | grep -E 'repository:|tag:' | awk '{print $1 $2}' >> "${dir}/tags/current-tags.log"
+    fi
 done
 
 # Checkout out last release tag and extract repository name and tag in its all values.yaml files
 git stash # stash current changes
 git switch --detach $last_release_tag
-# helm show values mojaloop | grep -E 'repository:|tag:' | awk '{print $1 $2}' > $dir/tags/last-release-tags.log
-for chart_dir in */; do
-  if [[ $chart_dir != .* ]] && [[ -f "${chart_dir}Chart.yaml" ]]; then
-    helm show values "$chart_dir" | grep -E 'repository:|tag:' | awk '{print $1 $2}' >> "${dir}/tags/last-release-tags.log"
-  fi
+find . -type d -name '[!.]*' -exec test -e "{}/Chart.yaml" ';' -print | while read chart_dir; do
+    base_chart_dir=$(echo $chart_dir | cut -d'/' -f2)
+    if [[ ! " ${excluded_charts[@]} " =~ " ${base_chart_dir} " ]]; then
+        helm show values "$chart_dir" | grep -E 'repository:|tag:' | awk '{print $1 $2}' >> "${dir}/tags/last-release-tags.log"
+    fi
 done
 
 # Checkout back to current branch
@@ -192,10 +224,6 @@ git stash pop # pop stashed changes
 # We create two associative arrays to store the repositories and tags from last-release-tags.log and current-tags.log
 # The associative arrays are indexed by the repository name and the value is the tag
 # We then iterate through the associative arrays and generate the changelog for each repository that has changed
-# NOTE: bash >= v4.0.0 is required for associative array
-
-declare -A last_release_tags
-declare -A current_tags
 
 # Read last release tags into associative array 'last_release_tags' 
 last_repo=null
@@ -262,7 +290,9 @@ export BREAKING_CHANGES=$(breaking_changes)
 [[ -z $BREAKING_CHANGES  ]] && BREAKING_CHANGES="There are no breaking changes in this release."
 export RELEASE_SUMMARY_POINTS=$(release_summary_points)
 export NEW_FEATURES=$(new_features)
+[[ -z $NEW_FEATURES  ]] && NEW_FEATURES="There are no new features in this release."
 export BUG_FIXES=$(bug_fixes)
+[[ -z $BUG_FIXES  ]] && BUG_FIXES="There are no bug fixes in this release."
 export APPLICATION_VERSIONS=$(application_versions)
 export TTK_TEST_CASES_VERSION=$(ttk_test_cases_version)
 export EXAMPLE_MOJALOOP_BACKEND_VERSION=$(example_mojaloop_backend_version)
@@ -270,6 +300,9 @@ export CURRENT_RELEASE_VERSION=$release_version
 export LAST_RELEASE_VERSION=$(echo $last_release_tag | cut -d'/' -f2)
 export INDIVIDUAL_CONTRIBUTORS=$(individual_contributors)
 
+# We use mustache bash template engine to replace the placeholders in the template with the template variables
+# Mustache bash template engine is a bash implementation of mustache template engine
+# It works better with newline characters than sed
 release_note=$(cat .github/workflows/templates/release-note-template.md | mo) 
 
 if [[ $release_note == *"{{"* ]] || [[ -z $release_note ]]

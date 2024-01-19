@@ -167,7 +167,6 @@ fi
 #######################
 # Prepare environment #
 #######################
-
 # We store the changelogs, commits, tags etc. in a temporary directory
 dir=".tmp"
 
@@ -184,7 +183,6 @@ mkdir -p "$dir/tags"
 ######################
 # Generate changelog #
 ######################
-
 release_version=$1
 current_branch=$(git branch --show-current)
 
@@ -226,38 +224,34 @@ git stash pop # pop stashed changes
 # We then iterate through the associative arrays and generate the changelog for each repository that has changed
 
 # Read last release tags into associative array 'last_release_tags' 
-last_repo=null
 while IFS= read -r line
 do
     if [[ $line == *"repository:"* ]]
     then
         repository=$(echo $line | cut -d':' -f2 | cut -d' ' -f1)
-        last_repo=$repository
-        last_release_tags[$last_repo]=null
+        last_release_tags[$repository]=null
     fi
     
     if [[ $line == *"tag:"* ]]
     then
         tag=$(echo $line | cut -d':' -f2)
-        last_release_tags[$last_repo]=$tag
+        last_release_tags[$repository]=$tag
     fi
 done < "$dir/tags/last-release-tags.log"
 
 # Read current tags into associative array 'current_tags'
-last_repo=null
 while IFS= read -r line
 do
     if [[ $line == *"repository:"* ]]
     then
         repository=$(echo $line | cut -d':' -f2 | cut -d' ' -f1)
-        last_repo=$repository
-        current_tags[$last_repo]=null
+        current_tags[$repository]=null
     fi
     
     if [[ $line == *"tag:"* ]]
     then
         tag=$(echo $line | cut -d':' -f2)
-        current_tags[$last_repo]=$tag
+        current_tags[$repository]=$tag
     fi
 done < "$dir/tags/current-tags.log"
 
@@ -278,8 +272,6 @@ done
 #########################
 # Generate release note #
 #########################
-
-# Generate release note
 # We use a template (.github/workflows/templates/release-note-template.md) to generate the release note
 # The template contains placeholders that are replaced with the PR titles from the changelogs and other information
 
@@ -319,7 +311,7 @@ echo "$release_note" > .changelog/release-$CURRENT_RELEASE_VERSION.md
 # Cleanup            #
 ######################
 # Remove temporary directory and files
-# rm -rf "$dir"
+rm -rf "$dir"
 
 # End process
 echo "Process completed successfully."

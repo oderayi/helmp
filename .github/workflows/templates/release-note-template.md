@@ -2,9 +2,10 @@
 
 Date | Revision | Description
 ---------|----------|---------
-{{RELEASE_DATE}}
+{{RELEASE_DATE}} | 0 | Initial draft
 
-- For *KNOWN ISSUES*, please review the section `#6` "Known Issues" below.
+- For *BREAKING ISSUES*, please review the section `#6` "Breaking Changes" below.
+- For *KNOWN ISSUES*, please review the section `#7` "Known Issues" below.
 
 ## 0. Summary
 
@@ -16,6 +17,7 @@ Enhancements and {{BREAKING_CHANGES_STATUS_TEXT}} changes to the [{{LAST_RELEASE
 
 {{BUG_FIXES}}
 
+## 3. Application Versions
 {{APPLICATION_VERSIONS}}
 
 ## 4. API Versions
@@ -36,14 +38,14 @@ This release supports the following versions of the [Mojaloop family of APIs](ht
 
     | Dependency | Version |  Notes   |
     | ---------- | ------- | --- |
-    | Kubernetes | {{K8S_VERSION}} | [AWS EKS](https://aws.amazon.com/eks/), [AWS EKS Supported Version Notes](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html)  |
-    | containerd  |  {{CONTAINERD_VERSION}}  |  |
-    | Nginx Ingress Controller | [helm-ingress-nginx-{{INGRESS_NGINX_VERSION}}](https://github.com/kubernetes/ingress-nginx/releases/tag/helm-chart-{{INGRESS_NGINX_VERSION}}) / [ingress-controller-{{INGRESS_CONTROLLER_VERSION}}](https://github.com/kubernetes/ingress-nginx/releases/tag/controller-{{INGRESS_CONTROLLER_VERSION}}) |     |
+    | Kubernetes | v1.28 | [AWS EKS](https://aws.amazon.com/eks/), [AWS EKS Supported Version Notes](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html)  |
+    | containerd  |  v1.6.19  |  |
+    | Nginx Ingress Controller | [helm-ingress-nginx-4.7.0](https://github.com/kubernetes/ingress-nginx/releases/tag/helm-chart-4.7.0) / [ingress-controller-v1.8.0](https://github.com/kubernetes/ingress-nginx/releases/tag/controller-v1.8.0) |     |
     |  Amazon Linux   |  v2   |     |
-    |  MySQL   |  bitnami/mysql:{{MYSQL_VERSION}}   |     |
-    |  Kafka   |  bitnami/kafka:{{KAFKA_VERSION}}   |     |
-    |  Redis   |  bitnami/redis:{{REDIS_VERSION}}   |     |
-    |  MongoDB   |  bitnami/mongodb:{{MONGODB_VERSION}}   |     |
+    |  MySQL   |  bitnami/mysql:8.0.32-debian-11-r0   |     |
+    |  Kafka   |  bitnami/kafka:3.3.1-debian-11-r1   |     |
+    |  Redis   |  bitnami/redis:7.0.5-debian-11-r7   |     |
+    |  MongoDB   |  bitnami/mongodb:6.0.2-debian-11-r11   |     |
     |  Testing Toolkit Test Cases   |  [{{TTK_TEST_CASES_VERSION}}](https://github.com/mojaloop/testing-toolkit-test-cases/releases/tag/{{TTK_TEST_CASES_VERSION}})   |     |
     |  example-mojaloop-backend   |  {{EXAMPLE_MOJALOOP_BACKEND_VERSION}}   |  [README](https://github.com/mojaloop/helm/blob/master/example-mojaloop-backend/README.md)   |
 
@@ -76,7 +78,11 @@ This release supports the following versions of the [Mojaloop family of APIs](ht
 
     For details regarding deployment and validation of simulators needed for bulk (for adoption provided in sdk-scheme-adapter) refer to [deploying Mojaloop TTK simulators](https://github.com/mojaloop/helm/blob/master/mojaloop-ttk-simulators/README.md).
 
-## 6. Known Issues
+## 6. Breaking Changes
+
+{{BREAKING_CHANGES}}
+
+## 7. Known Issues
 
 1. [#2119 - Idempotency for duplicate quote request](https://github.com/mojaloop/project/issues/2119)
 2. [#2322 - Helm install failing with with "medium to large" release names](https://github.com/mojaloop/project/issues/2322)
@@ -86,7 +92,7 @@ This release supports the following versions of the [Mojaloop family of APIs](ht
     1. [#2717 - Thirdparty TTK Test-Collection is not repeatable](https://github.com/mojaloop/project/issues/2717)
     2. [#2925 - Helm Test Intermittent failure with 'Generic ID not found](https://github.com/mojaloop/project/issues/2925)
 
-## 7. Contributors
+## 8. Contributors
 
 - Organizations: BMGF, InFiTX
 - Individuals: {{INDIVIDUAL_CONTRIBUTORS}}

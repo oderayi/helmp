@@ -13,3 +13,6 @@ while ! (grep -q "* Changed:	0" output.log); do
     updatecli apply --config .github/workflows/manifests/second-pass |& tee output.log
     sleep 5
 done
+
+# Remove temporary files
+rm -f output.log

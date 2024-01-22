@@ -13,8 +13,10 @@ Enhancements and {{BREAKING_CHANGES_STATUS_TEXT}} changes to the [{{LAST_RELEASE
 
 {{RELEASE_SUMMARY_POINTS}}
 
+## 1. New Features
 {{NEW_FEATURES}}
 
+## 2. Bug Fixes
 {{BUG_FIXES}}
 
 ## 3. Application Versions

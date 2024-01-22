@@ -1,13 +1,65 @@
 # Description: This script is used to generate release note for a release.
-# Requirements: bash >= v4.0.0, jq, curl, git, helm, mo, sed
-# Usage: .github/workflows/scripts/generate-release-note.sh release_version [last_release_tag]
+# Requirements: bash >= v4.0.0, jq, curl, git, helm, mo
+# Usage: .github/workflows/scripts/generate-release-note.sh release_version last_release_tag ttk-test-cases-version example-backend-version
 # Environment variables: AUTO_RELEASE_TOKEN
+
+####################################
+# Environment and arguments check  #
+####################################
+
+usage() {
+    echo "export AUTO_RELEASE_TOKEN=<github token>"
+    echo "generate-release-note.sh release_version last_release_tag ttk-test-cases-version example-backend-version"
+}
+
+# Check if the current shell is bash and the version is >= 4.0.0
+if [ -z "$BASH_VERSION" ] || [ "${BASH_VERSION:0:1}" -lt 4 ]; then
+    echo "This script requires bash >= v4.0.0. Please install bash >= v4.0.0 and try again."
+    exit 1
+fi
+
+# Check if the AUTO_RELEASE_TOKEN environment variable is set
+if [ -z "$AUTO_RELEASE_TOKEN" ]; then
+    echo "The AUTO_RELEASE_TOKEN environment variable is not set. Please set the AUTO_RELEASE_TOKEN environment variable and try again."
+    usage
+    exit 1
+fi
+
+# Check if the release_version argument is provided
+if [ -z "$1" ]; then
+    echo "The \"release_version\" argument is not provided. Please provide the \"release_version\" argument and try again."
+    usage
+    exit 1
+fi
+
+# Check if the last_release_tag argument is provided
+if [ -z "$2" ]; then
+    echo "The \"last_release_tag\" argument is not provided. Please provide the \"last_release_tag\" argument and try again."
+    usage
+    echo "last_release_tag = [ null | tag of the last release ]"
+    exit 1
+fi
+
+# Check if the ttk-test-cases-version argument is provided
+if [ -z "$3" ]; then
+    echo "The \"ttk-test-cases-version\" argument is not provided. Please provide the \"ttk-test-cases-version\" argument and try again."
+    usage
+    exit 1
+fi
+
+# Check if example-backend-version argument is provided
+if [ -z "$3" ]; then
+    echo "The \"example-backend-version\" argument is not provided. Please provide \"example-backend-version\" argument and try again."
+    usage
+    exit 1
+fi
 
 ######################
 # Global variables   #
 ######################
 declare -A last_release_tags
 declare -A current_tags
+
 excluded_charts=(
     "finance-portal"
     "finance-portal-settlement-management"
@@ -20,17 +72,43 @@ excluded_charts=(
     "monitoring"
 )
 
+release_version=$1
+# 'last_release_tag' is the last release tag, if not provided, it will be the last tag in the current branch
+if [ -z "$2" ] || [ $2 == null ]; then
+    last_release_tag=$(git describe --tags --abbrev=0)
+else
+    last_release_tag=$2
+fi
+test_cases_version=$3
+example_backend_version=$4
+
+#######################
+# Prepare environment #
+#######################
+# We store the changelogs, commits, tags etc. in a temporary directory
+dir=".tmp"
+
+# If the directory exists, remove its contents
+if [ -d "$dir" ]; then
+    rm -rf "$dir"/*
+fi
+
+# Create the temp directory and subdirectories
+mkdir -p "$dir/changelogs"
+mkdir -p "$dir/commits"
+mkdir -p "$dir/tags"
+
 ######################
 # Helper functions   #
 ######################
-usage() {
-    echo "export AUTO_RELEASE_TOKEN=<github token>"
-    echo "generate-release-note.sh release_version [last_release_tag]"
+escape_sed() {
+    echo "$1" | sed -e 's/[\/&]/\\&/g'
 }
 
+# Generate "Breaking Changes" section of the release note
 breaking_changes() {
     # Loop over each json file in .tmp/changelogs directory
-    # Extract the pull request titles from the json file into an associative array of array indexed by the file basename
+    # Extract the pull request titles from the json file into an associative array indexed by the file basename
     # The value of the associative array is an array of breaking changes
     # We then iterate through the associative array and generate the breaking changes section
     declare -A breaking_changes
@@ -58,32 +136,42 @@ breaking_changes() {
     echo "$breaking_changes_section"
 }
 
+# Generate release summary points section of the release note
 release_summary_points() {
     echo "_Release summary points go here..._"
 }
 
+# Generate "New Features" section of the release note
 new_features() {
     new_features=""
     for file in $dir/changelogs/*.json
     do
         repository=$(basename $file | cut -d'.' -f1)
-        new_features+=$(cat $file |  jq -r '.commits[].commit | select(.message | startswith("feat")) .message | split("\n")[0] as $pr_title | "* \($pr_title)"' | sort -u)
+        pr_title=$(cat $file |  jq -r '.commits[].commit | select(.message | startswith("feat")) .message | split("\n")[0] as $pr_title | "* \($pr_title)"')
+        echo "$pr_title" | while IFS= read -r line
+        do
+            description=$(echo "$line" | awk -F ': ' '{print $2}' | awk -F ' \\(#' '{print $1}')
+            issue_number=$(echo "$line" | awk -F '[/#)]' '{print $3}')
+            pr_number=$(echo "$line" | sed -n -e 's/.*(#\([^)]*\))$/\1/p')
+            echo -e "* **mojaloop/#$issue_number** $description ([mojaloop/#$pr_number](https://github.com/mojaloop/$repository/pull/$pr_number)), closes [mojaloop/#$issue_number](https://github.com/mojaloop/project/issues/$issue_number)"
+            
+        done
     done
-
-    echo "$new_features"
 }
 
+# Generate "Bug Fixes" section of the release note
 bug_fixes() {
     bug_fixes=""
     for file in $dir/changelogs/*.json
     do
         repository=$(basename $file | cut -d'.' -f1)
-        bug_fixes+=$(cat $file |  jq -r '.commits[].commit | select(.message | startswith("fix")) .message | split("\n")[0] as $pr_title | "* \($pr_title)"' | sort -u)
+        bug_fixes+=$(cat $file |  jq -r '.commits[].commit | select(.message | startswith("fix(")) .message | split("\n")[0] as $pr_title | "* \($pr_title)"' | sort -u)
     done
 
     echo "$bug_fixes"
 }
 
+# Generate "Application Versions" section of the release note
 application_versions() {
     application_versions=""
     line_number=0
@@ -96,7 +184,10 @@ application_versions() {
             if [[ ${current_tags[$repository]} != ${last_release_tags[$repository]} ]]
             then
                 line_number=$(( line_number+1 ))
-                application_versions+=$(echo -e "\n$line_number. $repository: ${last_release_tags[$repository]} -> [${current_tags[$repository]}](https://github.com/$repository/releases/${current_tags[$repository]}) ([Compare](https://github.com/$repository/compare/${last_release_tags[$repository]}...${current_tags[$repository]}))")
+                repository_short_name=$(echo $repository | cut -d'/' -f2)
+                application_versions+=$(echo -e "\n$line_number. $repository_short_name: ${last_release_tags[$repository]} -> \
+                    [${current_tags[$repository]}](https://github.com/$repository/releases/${current_tags[$repository]}) \
+                    ([Compare](https://github.com/$repository/compare/${last_release_tags[$repository]}...${current_tags[$repository]}))")
             fi
         fi
     done
@@ -109,7 +200,8 @@ application_versions() {
             if [[ ${current_tags[$repository]} == ${last_release_tags[$repository]} ]]
             then
                 line_number=$((line_number+1))
-                application_versions+=$(echo -e "\n$line_number. $repository: [${current_tags[$repository]}](https://github.com/$repository/releases/${current_tags[$repository]})")
+                repository_short_name=$(echo $repository | cut -d'/' -f2)
+                application_versions+=$(echo -e "\n$line_number. $repository_short_name: [${current_tags[$repository]}](https://github.com/$repository/releases/${current_tags[$repository]})")
             fi
         fi
     done
@@ -117,16 +209,7 @@ application_versions() {
     echo "$application_versions"
 }
 
-ttk_test_cases_version() {
-    # TODO: Add logic here
-    echo ""
-}
-
-example_mojaloop_backend_version() {
-    # TODO: Add logic here
-    echo ""
-}
-
+# Generate "Individual Contributors" section of the release note
 individual_contributors() {
     # Loop over each json file in .tmp/changelogs directory and extract the commit author login
     # We then remove duplicates, sort the list, and convert the list to a comma separated string
@@ -134,64 +217,26 @@ individual_contributors() {
     for file in $dir/changelogs/*.json
     do
         repository=$(basename $file | cut -d'.' -f1)
-        individual_contributors+=$(cat $file | jq -r '.commits[].author | select(.login != null) .login' | sort -u | tr '\n' ',' | sed 's/,$//g' | sed 's/,/, /g')
+        individual_contributors+=$(cat $file | jq -r '.commits[].author | select(.login != null) .login'  | sed 's/^/@/' | tr '\n' ',' | sed 's/,$//g' | sed 's/,/, /g')
     done
 
     echo "$individual_contributors"
 }
 
-####################################
-# Environment and arguments check  #
-####################################
+# Return the version of the TTK test cases used in the release
+ttk_test_cases_version() {
+    echo "$test_cases_version"
+}
 
-# Check if the current shell is bash and the version is >= 4.0.0
-if [ -z "$BASH_VERSION" ] || [ "${BASH_VERSION:0:1}" -lt 4 ]; then
-    echo "This script requires bash >= v4.0.0. Please install bash >= v4.0.0 and try again."
-    exit 1
-fi
-
-# Check if the AUTO_RELEASE_TOKEN environment variable is set
-if [ -z "$AUTO_RELEASE_TOKEN" ]; then
-    echo "The AUTO_RELEASE_TOKEN environment variable is not set. Please set the AUTO_RELEASE_TOKEN environment variable and try again."
-    usage
-    exit 1
-fi
-
-# Check if the release_version argument is provided
-if [ -z "$1" ]; then
-    echo "The release_version argument is not provided. Please provide the release_version argument and try again."
-    usage
-    exit 1
-fi
-
-#######################
-# Prepare environment #
-#######################
-# We store the changelogs, commits, tags etc. in a temporary directory
-dir=".tmp"
-
-# If the directory exists, remove its contents
-if [ -d "$dir" ]; then
-    rm -rf "$dir"/*
-fi
-
-# Create the temp directory and subdirectories
-mkdir -p "$dir/changelogs"
-mkdir -p "$dir/commits"
-mkdir -p "$dir/tags"
+# Return the version of the example mojaloop backend used in testing the release
+example_mojaloop_backend_version() {
+    echo "$example_backend_version"
+}
 
 ######################
 # Generate changelog #
 ######################
-release_version=$1
 current_branch=$(git branch --show-current)
-
-# 'last_release_tag' is the last release tag, if not provided, it will be the last tag in the current branch
-if [ -z "$2" ]; then
-    last_release_tag=$(git describe --tags --abbrev=0)
-else
-    last_release_tag=$2
-fi
 
 # Extract and store repository name and tag in all values.yaml files
 find . -type d -name '[!.]*' -exec test -e "{}/Chart.yaml" ';' -print | while read chart_dir; do
@@ -311,7 +356,7 @@ echo "$release_note" > .changelog/release-$CURRENT_RELEASE_VERSION.md
 # Cleanup            #
 ######################
 # Remove temporary directory and files
-rm -rf "$dir"
+# rm -rf "$dir"
 
 # End process
 echo "Process completed successfully."

@@ -63,26 +63,26 @@ jobs:
           ref: ${{ inputs.branch }}
           fetch-depth: 1
 
-      - name: Set up Helm
-        id: setup-helm
-        uses: azure/setup-helm@v3
-        with:
-          version: v3.13.3
+      # - name: Set up Helm
+      #   id: setup-helm
+      #   uses: azure/setup-helm@v3
+      #   with:
+      #     version: v3.13.3
 
-      - name: Install Dependencies
-        id: install-dpendencies
-        run: |
-          # Install mo
-          curl -sL -o /tmp/mo https://raw.githubusercontent.com/tests-always-included/mo/master/mo
-          chmod +x /tmp/mo
-          sudo mv /tmp/mo /usr/local/bin/
+      # - name: Install Dependencies
+      #   id: install-dpendencies
+      #   run: |
+      #     # Install mo
+      #     curl -sL -o /tmp/mo https://raw.githubusercontent.com/tests-always-included/mo/master/mo
+      #     chmod +x /tmp/mo
+      #     sudo mv /tmp/mo /usr/local/bin/
 
-          # Install updatecli
-          curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
-          sudo apt install /tmp/updatecli_amd64.deb
+      #     # Install updatecli
+      #     curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
+      #     sudo apt install /tmp/updatecli_amd64.deb
 
-          # Install jq
-          sudo apt-get install jq
+      #     # Install jq
+      #     sudo apt-get install jq
 
       # - name: Update chart dependencies
       #   id: update-chart-dependencies
@@ -148,7 +148,7 @@ jobs:
         id: clone-oss-core-env
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.AUTO_RELEASE_TOKEN }}
+          # token: ${{ secrets.AUTO_RELEASE_TOKEN }}
           repository: mojaloop/oss-core-env
           ref: master
           path: .tmp/oss-core-env

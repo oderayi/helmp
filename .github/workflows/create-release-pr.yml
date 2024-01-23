@@ -114,8 +114,7 @@ jobs:
         id: generate-release-note
         env:
           AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-          RELEASE_VERSION: ${{ steps.determine-release-version.outputs.RELEASE_VERSION }}
-        run: .github/workflows/scripts/generate-release-note.sh ${{ inputs.release_name }} $RELEASE_VERSION ${{ inputs.last_release_tag }} ${{ inputs.example_backend_version }}
+        run: .github/workflows/scripts/generate-release-note.sh ${{ inputs.release_name }} ${{ steps.determine-release-version.outputs.RELEASE_VERSION }} ${{ inputs.last_release_tag }} ${{ inputs.example_backend_version }}
 
       - name: Deploy charts to test environment
         id: deploy-charts

@@ -148,7 +148,7 @@ jobs:
         id: clone-oss-core-env
         uses: actions/checkout@v4
         with:
-          # token: ${{ secrets.AUTO_RELEASE_TOKEN }}
+          token: ${{ secrets.AUTO_RELEASE_TOKEN }}
           repository: mojaloop/oss-core-env
           ref: master
           path: .tmp/oss-core-env

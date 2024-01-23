@@ -16,9 +16,21 @@ on:
           description: 'Branch to create release PR from (e.g. master, empty for PR branch)'
           required: true
           default: 'master'
+        release_name:
+          type: string
+          description: 'Release name (e.g. Acacia)'
+          required: false
+        release_version:
+          type: string
+          description: 'Release version (e.g. v1.0.0)'
+          required: false
         last_release_tag:
           type: string
           description: 'Last release tag (e.g. v1.0.0)'
+          required: true
+        example_backend_version:
+          type: string
+          description: 'Example backend version (e.g. v1.0.0)'
           required: true
 
 jobs:
@@ -39,45 +51,83 @@ jobs:
         with:
           version: v3.13.3
 
-      - name: Install UpdateCLI
-        id: install-updatecli
+      - name: Install Dependencies
+        id: install-dpendencies
         run: |
+          # Install updatecli
           curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
           sudo apt install /tmp/updatecli_amd64.deb
+
+          # Install jq
+          sudo apt-get install jq
+
+          # Install mo
+          curl -sSL https://raw.githubusercontent.com/tests-always-included/mo/master/mo -o mo
+          chmod +x mo
+          sudo mv mo /usr/local/bin/
+
+      # - name: Update chart dependencies
+      #   id: update-chart-dependencies
+      #   env:
+      #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+      #   run: .github/workflows/scripts/update-charts.sh
+
+      # - name: Generate changelog
+      #   id: generate-changelog
+      #   env:
+      #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+      #   run: .github/workflows/scripts/generate-changelog.sh
       
-      # # update chart dependencies
-      - name: Update chart dependencies
-        id: update-chart-dependencies
-        env:
-          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-        run: .github/workflows/scripts/update-charts.sh
+      - name: Determine release version number
+        id: determine-release-version
+        run: |
+          if [[ -z ${{ inputs.release_version }} ]]; then
+            release_version=$(.github/workflows/scripts/determine-release-version.sh  ${{ inputs.last_release_tag }})
+            export RELEASE_VERSION=$release_version
+            echo "::set-output name=RELEASE_VERSION::$release_version"
+            echo "RELEASE_VERSION=$release_version" >> $GITHUB_OUTPUT
+          else
+            export RELEASE_VERSION=${{ inputs.release_version }}
+            echo "::set-output name=RELEASE_VERSION::${{ inputs.release_version }}"
+            echo "RELEASE_VERSION=${{ inputs.release_version }}" >> $GITHUB_OUTPUT
+          fi
       
-      # step: generate release note
-      # - gather changelogs and generate release note
-      # - detect breaking changes (default.json changes, migration scripts changes, 
-      #       presence of phrase "BREAKING CHANGE" in changelogs, etc.)
-      - name: Generate release note
-        id: generate-release-note
-        env:
-          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-        run: .github/workflows/scripts/generate-release-note.sh
-
-      # step: try linting and updating charts
-
-      # step: deploy charts to staging environment
-
-        # NOTE: For this action to work GitHub Actions must be explicitly allowed to create pull requests.
-        # This setting can be found in a repository's settings under Actions > General > Workflow permissions.
-      - name: Create Pull Request
-        id: create_pr
-        uses: peter-evans/create-pull-request@v5
+      - name: Prepare TTK test cases release
+        id: prepare-ttk-test-cases-release
+        uses: ncipollo/release-action@v1
         with:
-          # NOTE: This token should have permissions (`contents: write` and `pull-requests: write`)
-          token: ${{ secrets.AUTO_RELEASE_TOKEN }} 
-          commit-message: "chore: upgrade helm chart depdenencies"
-          title: "[auto] feat: release candidate"
-          body: |
-            Release candidate for the next version of the helm charts.
-          branch: release/release-candidate-${{ github.run_id }}
-          base: master
-          draft: true
+          token: ${{ secrets.AUTO_RELEASE_TOKEN }}
+          owner: mojaloop
+          repo: testing-toolkit-test-cases
+          makeLatest: false
+          allowUpdates: false
+          generateReleaseNotes: false
+          skipIfReleaseExists: true
+          tag: ${{ steps.determine-release-version.outputs.RELEASE_VERSION }}
+          commit: master
+      
+      # - name: Generate release note
+      #   id: generate-release-note
+      #   env:
+      #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+      #     RELEASE_VERSION: ${{ steps.determine-release-version.outputs.RELEASE_VERSION }}
+      #   run: .github/workflows/scripts/generate-release-note.sh ${{ inputs.release_name }} $RELEASE_VERSION ${{ inputs.last_release_tag }} ${{ inputs.example_backend_version }}
+
+      # - name: Deploy charts to test environment
+      #   id: deploy-charts
+      #   run: .github/workflows/scripts/deploy-charts.sh
+
+      # # NOTE: For this action to work GitHub Actions must be explicitly allowed to create pull requests.
+      # # This setting can be found in a repository's settings under Actions > General > Workflow permissions.
+      # - name: Create Pull Request
+      #   id: create_pr
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     token: ${{ secrets.AUTO_RELEASE_TOKEN }} 
+      #     commit-message: "chore: upgrade helm chart depdenencies"
+      #     title: "[auto] feat: release candidate"
+      #     body: |
+      #       Release candidate for the next version of the helm charts.
+      #     branch: release/release-candidate-${{ github.run_id }}
+      #     base: master
+      #     draft: true

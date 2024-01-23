@@ -33,6 +33,26 @@ on:
         description: "Example backend version (e.g. v1.0.0)"
         required: true
         default: "v15.0.0"
+      deployment_release_name:
+        type: string
+        description: "Deployment release name (e.g. moja1)"
+        required: true
+        default: "moja2"
+      deployment_namespace:
+        type: string
+        description: "Deployment namespace (e.g. moja1)"
+        required: true
+        default: "moja2"
+      deployment_helm_version:
+        type: string
+        description: "Deployment environment version (e.g. 15.2.0)"
+        required: true
+        default: "15.2.0"
+      deployment_values_file:
+        type: string
+        description: "Deployment values file in oss-core-env repo"
+        required: true
+        default: "helm-values-moja2-mojaloop-v15.2.0.yaml"
 
 jobs:
   create_release_pr:
@@ -69,67 +89,120 @@ jobs:
           # Install jq
           sudo apt-get install jq
 
-      - name: Update chart dependencies
-        id: update-chart-dependencies
-        env:
-          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-        run: .github/workflows/scripts/update-charts.sh
+      # - name: Update chart dependencies
+      #   id: update-chart-dependencies
+      #   env:
+      #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+      #   run: .github/workflows/scripts/update-charts.sh
 
-      - name: Generate changelog
-        id: generate-changelog
-        env:
-          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-        run: .github/workflows/scripts/generate-changelog.sh
+      # - name: Generate changelog
+      #   id: generate-changelog
+      #   env:
+      #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+      #   run: .github/workflows/scripts/generate-changelog.sh
 
-      - name: Determine release version number
-        id: determine-release-version
+      # - name: Determine release version number
+      #   id: determine-release-version
+      #   run: |
+      #     if [[ -z '${{ inputs.release_version }}' ]]; then
+      #       release_version=$(.github/workflows/scripts/determine-release-version.sh  ${{ inputs.last_release_tag }})
+      #       export RELEASE_VERSION=$release_version
+      #       echo "RELEASE_VERSION=$release_version" >> $GITHUB_OUTPUT
+      #     else
+      #       export RELEASE_VERSION=${{ inputs.release_version }}
+      #       echo "RELEASE_VERSION=${{ inputs.release_version }}" >> $GITHUB_OUTPUT
+      #     fi
+
+      # - name: Prepare TTK test cases release
+      #   id: prepare-ttk-test-cases-release
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     token: ${{ secrets.AUTO_RELEASE_TOKEN }}
+      #     repo: testing-toolkit-test-cases
+      #     makeLatest: true
+      #     allowUpdates: false
+      #     generateReleaseNotes: true
+      #     skipIfReleaseExists: true
+      #     tag: ${{ steps.determine-release-version.outputs.RELEASE_VERSION }}
+      #     commit: master
+
+      # - name: Update TTK test-cases version to charts
+      #   id: update-ttk-test-cases-version
+      #   run: updatecli apply --config .github/workflows/manifests/first-pass/mojaloop.yaml
+
+      # - name: Generate release note
+      #   id: generate-release-note
+      #   env:
+      #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+      #   run: .github/workflows/scripts/generate-release-note.sh '${{ inputs.release_name }}' '${{ steps.determine-release-version.outputs.RELEASE_VERSION }}' '${{ inputs.last_release_tag }}' '${{ inputs.example_backend_version }}'
+
+      # - name: Create Pull Request
+      #   id: create_pr
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     token: ${{ secrets.AUTO_RELEASE_TOKEN }}
+      #     commit-message: "chore: upgrade helm chart depdenencies"
+      #     title: "[auto] feat: release candidate"
+      #     body: |
+      #       Release candidate for the next version of the helm charts.
+      #     branch: release/release-candidate-${{ github.run_id }}
+      #     base: master
+      #     draft: true
+
+      - name: Clone oss-core-env repository
+        id: clone-oss-core-env
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.AUTO_RELEASE_TOKEN }}
+          repository: mojaloop/oss-core-env
+          ref: master
+          path: .tmp/oss-core-env
+      
+      - name: Prep deployment values file
+        id: prep-deployment-values-file
         run: |
-          if [[ -z '${{ inputs.release_version }}' ]]; then
-            release_version=$(.github/workflows/scripts/determine-release-version.sh  ${{ inputs.last_release_tag }})
-            export RELEASE_VERSION=$release_version
-            echo "RELEASE_VERSION=$release_version" >> $GITHUB_OUTPUT
-          else
-            export RELEASE_VERSION=${{ inputs.release_version }}
-            echo "RELEASE_VERSION=${{ inputs.release_version }}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Prepare TTK test cases release
-        id: prepare-ttk-test-cases-release
-        uses: ncipollo/release-action@v1
-        with:
-          token: ${{ secrets.AUTO_RELEASE_TOKEN }}
-          repo: testing-toolkit-test-cases
-          makeLatest: true
-          allowUpdates: false
-          generateReleaseNotes: true
-          skipIfReleaseExists: true
-          tag: ${{ steps.determine-release-version.outputs.RELEASE_VERSION }}
-          commit: master
-
-      - name: Update TTK test-cases version to charts
-        id: update-ttk-test-cases-version
-        run: updatecli apply --config .github/workflows/manifests/first-pass/mojaloop.yaml
-
-      - name: Generate release note
-        id: generate-release-note
-        env:
-          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-        run: .github/workflows/scripts/generate-release-note.sh ${{ inputs.release_name }} ${{ steps.determine-release-version.outputs.RELEASE_VERSION }} ${{ inputs.last_release_tag }} ${{ inputs.example_backend_version }}
-
-      - name: Deploy charts to test environment
+          set -a && . .tmp/oss-core-env/config/test-mojaloop-live/.env && set +a
+          sed -i "s/{{CI_ENV_NAME}}/$ENV_NAME/" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
+          sed -i "s/{{CI_HELM_NAMESPACE}}/${{ inputs.deployment_namespace }}/" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
+          sed -i "s/{{CI_ENV_VERSION}}/${{ inputs.deployment_helm_version }}//" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
+      
+      - name: Deploy charts
         id: deploy-charts
-        run: .github/workflows/scripts/deploy-charts.sh
+        run: |
+          echo "${{ secrets.AUTO_RELEASE_KUBECONFIG }}" > .tmp/test.mojaloop.live
+          
+          echo "Adding helm repos"
+          helm repo add stable https://charts.helm.sh/stable
+          helm repo add incubator https://charts.helm.sh/incubator
+          helm repo add kiwigrid https://kiwigrid.github.io
+          helm repo add kokuwa https://kokuwaio.github.io/helm-charts
+          helm repo add elastic https://helm.elastic.co
+          helm repo add codecentric https://codecentric.github.io/helm-charts
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add mojaloop-charts https://mojaloop.github.io/charts/repo 
+          helm repo add redpanda https://charts.redpanda.com
+          helm repo add mojaloop https://mojaloop.io/helm/repo/
+          helm repo update
 
-      - name: Create Pull Request
-        id: create_pr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.AUTO_RELEASE_TOKEN }}
-          commit-message: "chore: upgrade helm chart depdenencies"
-          title: "[auto] feat: release candidate"
-          body: |
-            Release candidate for the next version of the helm charts.
-          branch: release/release-candidate-${{ github.run_id }}
-          base: master
-          draft: true
+          # Delete existing deployments
+          helm ls -n ${{ inputs.deployment_namespace }} --short --kubeconfig=.tmp/test.mojaloop.live | xargs -L1 helm uninstall -n ${{ inputs.deployment_namespace }} --kubeconfig=.tmp/test.mojaloop.live
+          
+          # Deploy example-backend
+          helm install backend mojaloop/example-mojaloop-backend --kubeconfig=.tmp/test.mojaloop.live --namespace ${{ inputs.deployment_namespace }} 
+          
+          # Install Mojaloop
+          helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }} --kubeconfig=.tmp/test.mojaloop.live
+
+
+      # - name: Deploy charts to test environment
+      #   uses: 'deliverybot/helm@v1'
+      #   with:
+      #     token: ${{ secrets.AUTO_RELEASE_TOKEN }}
+      #     release: ${{ inputs.deployment_release_name }}
+      #     namespace: ${{ inputs.deployment_namespace }}
+      #     chart: mojaloop
+      #     value-files: |
+      #       - .tmp/oss-core-env/${{ inputs.deployment_values_file}}
+      #   env:
+      #     KUBECONFIG_FILE: ${{ secrets.AUTO_RELEASE_KUBECONFIG }}
     

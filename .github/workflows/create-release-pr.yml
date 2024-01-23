@@ -1,38 +1,38 @@
 # NOTES:
-# - GitHub Actions must be explicitly allowed to create pull requests in this repository. 
-#   This setting can be found in the repository's settings under Actions > General > Workflow permissions. 
-# - A repository secret `AUTO_RELEASE_TOKEN` (permissions: `contents: write`, `pull-requests: write`, `repositories: read`) needs to be created. 
+# - GitHub Actions must be explicitly allowed to create pull requests in this repository.
+#   This setting can be found in the repository's settings under Actions > General > Workflow permissions.
+# - A repository secret `AUTO_RELEASE_TOKEN` (permissions: `contents: write`, `pull-requests: write`, `repositories: read`) needs to be created.
 #   The secret should contain a github access token with the permissions specified above.
 #   The secret is used by the `create-pull-request` action to create the pull request and `updatecli` to access all updateable repositories.
 #   The secret can be created at https://github.com/mojaloop/helm/settings/secrets/actions
 
-name: Create release PR
+name: Create Release PR
 
-on: 
-    workflow_dispatch:
-      inputs:
-        branch:
-          type: string
-          description: 'Branch to create release PR from (e.g. master, empty for PR branch)'
-          required: false
-          default: 'master'
-        release_name:
-          type: string
-          description: 'Release name (e.g. Acacia)'
-          required: false
-        release_version:
-          type: string
-          description: 'Release version (e.g. v1.0.0)'
-          required: false
-        last_release_tag:
-          type: string
-          description: 'Last release tag (e.g. v1.0.0)'
-          required: true
-        example_backend_version:
-          type: string
-          description: 'Example backend version (e.g. v1.0.0)'
-          required: true
-          default: 'v15.0.0'
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        description: "Branch to create release PR from (e.g. master, empty for PR branch)"
+        required: false
+        default: "master"
+      release_name:
+        type: string
+        description: "Release name (e.g. Acacia)"
+        required: false
+      release_version:
+        type: string
+        description: "Release version (e.g. v1.0.0)"
+        required: false
+      last_release_tag:
+        type: string
+        description: "Last release tag (e.g. v1.0.0)"
+        required: true
+      example_backend_version:
+        type: string
+        description: "Example backend version (e.g. v1.0.0)"
+        required: true
+        default: "v15.0.0"
 
 jobs:
   create_release_pr:
@@ -69,18 +69,18 @@ jobs:
           # Install jq
           sudo apt-get install jq
 
-      # - name: Update chart dependencies
-      #   id: update-chart-dependencies
-      #   env:
-      #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-      #   run: .github/workflows/scripts/update-charts.sh
+      - name: Update chart dependencies
+        id: update-chart-dependencies
+        env:
+          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+        run: .github/workflows/scripts/update-charts.sh
 
-      # - name: Generate changelog
-      #   id: generate-changelog
-      #   env:
-      #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-      #   run: .github/workflows/scripts/generate-changelog.sh
-      
+      - name: Generate changelog
+        id: generate-changelog
+        env:
+          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+        run: .github/workflows/scripts/generate-changelog.sh
+
       - name: Determine release version number
         id: determine-release-version
         run: |
@@ -92,7 +92,7 @@ jobs:
             export RELEASE_VERSION=${{ inputs.release_version }}
             echo "RELEASE_VERSION=${{ inputs.release_version }}" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Prepare TTK test cases release
         id: prepare-ttk-test-cases-release
         uses: ncipollo/release-action@v1
@@ -105,29 +105,32 @@ jobs:
           skipIfReleaseExists: true
           tag: ${{ steps.determine-release-version.outputs.RELEASE_VERSION }}
           commit: master
-      
-      # - name: Generate release note
-      #   id: generate-release-note
-      #   env:
-      #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
-      #     RELEASE_VERSION: ${{ steps.determine-release-version.outputs.RELEASE_VERSION }}
-      #   run: .github/workflows/scripts/generate-release-note.sh ${{ inputs.release_name }} $RELEASE_VERSION ${{ inputs.last_release_tag }} ${{ inputs.example_backend_version }}
 
-      # - name: Deploy charts to test environment
-      #   id: deploy-charts
-      #   run: .github/workflows/scripts/deploy-charts.sh
+      - name: Update TTK test-cases version to charts
+        id: update-ttk-test-cases-version
+        run: updatecli apply --config .github/workflows/manifests/first-pass/mojaloop.yaml
 
-      # # NOTE: For this action to work GitHub Actions must be explicitly allowed to create pull requests.
-      # # This setting can be found in a repository's settings under Actions > General > Workflow permissions.
-      # - name: Create Pull Request
-      #   id: create_pr
-      #   uses: peter-evans/create-pull-request@v5
-      #   with:
-      #     token: ${{ secrets.AUTO_RELEASE_TOKEN }} 
-      #     commit-message: "chore: upgrade helm chart depdenencies"
-      #     title: "[auto] feat: release candidate"
-      #     body: |
-      #       Release candidate for the next version of the helm charts.
-      #     branch: release/release-candidate-${{ github.run_id }}
-      #     base: master
-      #     draft: true
+      - name: Generate release note
+        id: generate-release-note
+        env:
+          AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
+          RELEASE_VERSION: ${{ steps.determine-release-version.outputs.RELEASE_VERSION }}
+        run: .github/workflows/scripts/generate-release-note.sh ${{ inputs.release_name }} $RELEASE_VERSION ${{ inputs.last_release_tag }} ${{ inputs.example_backend_version }}
+
+      - name: Deploy charts to test environment
+        id: deploy-charts
+        run: .github/workflows/scripts/deploy-charts.sh
+
+      - name: Create Pull Request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.AUTO_RELEASE_TOKEN }}
+          commit-message: "chore: upgrade helm chart depdenencies"
+          title: "[auto] feat: release candidate"
+          body: |
+            Release candidate for the next version of the helm charts.
+          branch: release/release-candidate-${{ github.run_id }}
+          base: master
+          draft: true
+    

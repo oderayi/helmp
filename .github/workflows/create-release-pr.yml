@@ -38,6 +38,8 @@ jobs:
   create_release_pr:
     if: '!github.event.pull_request.draft'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         id: checkout

@@ -43,11 +43,6 @@ on:
         description: "Deployment namespace (e.g. moja1)"
         required: true
         default: "moja2"
-      deployment_helm_version:
-        type: string
-        description: "Deployment environment version (e.g. 15.2.0)"
-        required: true
-        default: "15.2.0"
       deployment_values_file:
         type: string
         description: "Deployment values file in oss-core-env repo"
@@ -101,17 +96,17 @@ jobs:
       #     AUTO_RELEASE_TOKEN: ${{ secrets.AUTO_RELEASE_TOKEN }}
       #   run: .github/workflows/scripts/generate-changelog.sh
 
-      # - name: Determine release version number
-      #   id: determine-release-version
-      #   run: |
-      #     if [[ -z '${{ inputs.release_version }}' ]]; then
-      #       release_version=$(.github/workflows/scripts/determine-release-version.sh  ${{ inputs.last_release_tag }})
-      #       export RELEASE_VERSION=$release_version
-      #       echo "RELEASE_VERSION=$release_version" >> $GITHUB_OUTPUT
-      #     else
-      #       export RELEASE_VERSION=${{ inputs.release_version }}
-      #       echo "RELEASE_VERSION=${{ inputs.release_version }}" >> $GITHUB_OUTPUT
-      #     fi
+      - name: Determine release version number
+        id: determine-release-version
+        run: |
+          if [[ -z '${{ inputs.release_version }}' ]]; then
+            release_version=$(.github/workflows/scripts/determine-release-version.sh  ${{ inputs.last_release_tag }})
+            export RELEASE_VERSION=$release_version
+            echo "RELEASE_VERSION=$release_version" >> $GITHUB_OUTPUT
+          else
+            export RELEASE_VERSION=${{ inputs.release_version }}
+            echo "RELEASE_VERSION=${{ inputs.release_version }}" >> $GITHUB_OUTPUT
+          fi
 
       # - name: Prepare TTK test cases release
       #   id: prepare-ttk-test-cases-release
@@ -164,7 +159,7 @@ jobs:
           set -a && . .tmp/oss-core-env/config/test-mojaloop-live/.env && set +a
           sed -i "s/{{CI_ENV_NAME}}/$ENV_NAME/" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
           sed -i "s/{{CI_HELM_NAMESPACE}}/${{ inputs.deployment_namespace }}/" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
-          sed -i "s/{{CI_ENV_VERSION}}/${{ inputs.deployment_helm_version }}//" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
+          sed -i "s/{{CI_ENV_VERSION}}/${{ steps.determine-release-version.outputs.RELEASE_VERSION }}//" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
       
       - name: Deploy charts
         id: deploy-charts

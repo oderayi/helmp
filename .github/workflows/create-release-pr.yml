@@ -14,7 +14,7 @@ on:
         branch:
           type: string
           description: 'Branch to create release PR from (e.g. master, empty for PR branch)'
-          required: true
+          required: false
           default: 'master'
         release_name:
           type: string

@@ -38,7 +38,8 @@ jobs:
   create_release_pr:
     if: '!github.event.pull_request.draft'
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         id: checkout
@@ -96,7 +97,7 @@ jobs:
         id: prepare-ttk-test-cases-release
         uses: ncipollo/release-action@v1
         with:
-          # token: ${{ secrets.AUTO_RELEASE_TOKEN }}
+          token: ${{ secrets.AUTO_RELEASE_TOKEN }}
           # owner: oderayi
           repo: testing-toolkit-test-cases
           makeLatest: false

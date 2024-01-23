@@ -57,17 +57,17 @@ jobs:
       - name: Install Dependencies
         id: install-dpendencies
         run: |
+          # Install mo
+          curl -sSL https://raw.githubusercontent.com/tests-always-included/mo/master/mo -o mo
+          chmod +x mo
+          sudo mv mo /usr/local/bin/
+
           # Install updatecli
           curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
           sudo apt install /tmp/updatecli_amd64.deb
 
           # Install jq
           sudo apt-get install jq
-
-          # Install mo
-          curl -sSL https://raw.githubusercontent.com/tests-always-included/mo/master/mo -o mo
-          chmod +x mo
-          sudo mv mo /usr/local/bin/
 
       # - name: Update chart dependencies
       #   id: update-chart-dependencies
@@ -98,11 +98,10 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.AUTO_RELEASE_TOKEN }}
-          # owner: oderayi
           repo: testing-toolkit-test-cases
-          makeLatest: false
+          makeLatest: true
           allowUpdates: false
-          generateReleaseNotes: false
+          generateReleaseNotes: true
           skipIfReleaseExists: true
           tag: ${{ steps.determine-release-version.outputs.RELEASE_VERSION }}
           commit: master

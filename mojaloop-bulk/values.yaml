@@ -15,7 +15,7 @@ bulk-api-adapter:
     image:
       registry: docker.io
       repository: mojaloop/bulk-api-adapter
-      tag: v16.0.1
+      tag: v17.0.0
       ## Specify a imagePullPolicy
       ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
       ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -131,7 +131,8 @@ bulk-api-adapter:
 
       # Protocol versions used for validating (VALIDATELIST) incoming FSPIOP API Headers (Content-type, Accept),
       # and for generating requests/callbacks from the Switch itself (DEFAULT value)
-      protocol_versions: {
+      protocol_versions: |
+        {
             "CONTENT": {
                 "DEFAULT": "1.1",
                 "VALIDATELIST": [
@@ -336,7 +337,7 @@ bulk-api-adapter:
     image:
       registry: docker.io
       repository: mojaloop/bulk-api-adapter
-      tag: v16.0.1
+      tag: v17.0.0
       ## Specify a imagePullPolicy
       ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
       ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -453,7 +454,8 @@ bulk-api-adapter:
 
       # Protocol versions used for validating (VALIDATELIST) incoming FSPIOP API Headers (Content-type, Accept),
       # and for generating requests/callbacks from the Switch itself (DEFAULT value)
-      protocol_versions: {
+      protocol_versions: |
+        {
             "CONTENT": {
                 "DEFAULT": "1.1",
                 "VALIDATELIST": [
@@ -679,7 +681,7 @@ bulk-centralledger:
     image:
       registry: docker.io
       repository: mojaloop/central-ledger
-      tag: v17.3.0
+      tag: v17.4.0
       ## Specify a imagePullPolicy
       ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
       ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -1062,7 +1064,7 @@ bulk-centralledger:
     image:
       registry: docker.io
       repository: mojaloop/central-ledger
-      tag: v17.3.0
+      tag: v17.4.0
       ## Specify a imagePullPolicy
       ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
       ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -1433,7 +1435,7 @@ bulk-centralledger:
     image:
       registry: docker.io
       repository: mojaloop/central-ledger
-      tag: v17.3.0
+      tag: v17.4.0
       ## Specify a imagePullPolicy
       ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
       ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -1813,7 +1815,7 @@ bulk-centralledger:
     image:
       registry: docker.io
       repository: mojaloop/central-ledger
-      tag: v17.3.0
+      tag: v17.4.0
       ## Specify a imagePullPolicy
       ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
       ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images

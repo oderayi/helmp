@@ -2,12 +2,14 @@
 # This is a YAML-formatted file.
 # Declare global configurations
 global: {}
+
 # Declare variables to be passed into your templates.
 bulk-api-adapter-service:
   enabled: true
   # Default values for bulk-api-adapter.
   # This is a YAML-formatted file.
   # Declare variables to be passed into your templates.
+
   image:
     registry: docker.io
     repository: mojaloop/bulk-api-adapter
@@ -25,8 +27,10 @@ bulk-api-adapter-service:
     ##   - myRegistryKeySecretName
     ##
     pullSecrets: []
+
   replicaCount: 1
   command: '["node", "src/api/index.js"]'
+
   ## Enable diagnostic mode in the deployment
   ##
   diagnosticMode:
@@ -35,39 +39,46 @@ bulk-api-adapter-service:
     enabled: false
     ## @param diagnosticMode.command Command to override all containers in the deployment
     ##
-    command:
+    command: 
       - node
       - src/api/index.js
     ## @param diagnosticMode.args Args to override all containers in the deployment
     ##
     args:
       - --inspect=0.0.0.0:{{ .Values.diagnosticMode.debug.port }}
+    
     ## @param diagnosticMode.debug config to override all debug information
     ##
     debug:
       internalPort: 9229
       port: 9229
+
   readinessProbe:
     enabled: true
     httpGet:
       path: /health
     initialDelaySeconds: 60
     periodSeconds: 15
+
   livenessProbe:
     enabled: true
     httpGet:
       path: /health
     initialDelaySeconds: 60
     periodSeconds: 15
+
   ## Pod scheduling preferences.
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
+
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   nodeSelector: {}
+
   ## Set toleration for scheduler
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
+
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param containerSecurityContext.enabled Enabled %%MAIN_CONTAINER_NAME%% containers' Security Context
@@ -76,6 +87,7 @@ bulk-api-adapter-service:
   containerSecurityContext:
     enabled: true
     runAsUser: 1001
+
   ## metric configuration for prometheus instrumentation
   metrics:
     ## flag to enable/disable the metrics end-points
@@ -85,10 +97,12 @@ bulk-api-adapter-service:
       prefix: moja_
       defaultLabels:
         serviceName: bulk-service
+
   config:
     # this can be set if the dependency chart for kafka is disabled. If 'kafka_host' is commented out, then the name of the dependency chart will be used.
     kafka_host: kafka
     kafka_port: 9092
+
     mongo_host: 'cep-mongodb'
     mongo_port: 27017
     mongo_user: mojaloop
@@ -103,16 +117,38 @@ bulk-api-adapter-service:
     #   name: cep-mongodb
     #   key: mongodb-passwords
     mongo_database: mlos
+
     central_services_host: '$release_name-centralledger-service'
     central_services_port: 80
+
     security:
       callback:
         rejectUnauthorized: true
     log_level: 'info'
     log_transport: file
+
     # Protocol versions used for validating (VALIDATELIST) incoming FSPIOP API Headers (Content-type, Accept),
     # and for generating requests/callbacks from the Switch itself (DEFAULT value)
-    protocol_versions: {"CONTENT": {"DEFAULT": "1.1", "VALIDATELIST": ["1", "1.0", "1.1"]}, "ACCEPT": {"DEFAULT": "1", "VALIDATELIST": ["1", "1.0", "1.1"]}}
+    protocol_versions: |
+      {
+          "CONTENT": {
+              "DEFAULT": "1.1",
+              "VALIDATELIST": [
+                  "1",
+                  "1.0",
+                  "1.1"
+              ]
+          },
+          "ACCEPT": {
+              "DEFAULT": "1",
+              "VALIDATELIST": [
+                  "1",
+                  "1.0",
+                  "1.1"
+              ]
+          }
+      }
+
   ## @param initContainers Add additional init containers to the %%MAIN_CONTAINER_NAME%% pod(s)
   ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
   ## e.g:
@@ -176,6 +212,7 @@ bulk-api-adapter-service:
           {{- end }}
         - name: DB_DATABASE
           value: '{{ .Values.config.mongo_database }}'
+
   service:
     internalPort: 8088
     ## @param service.type %%MAIN_CONTAINER_NAME%% service type
@@ -193,15 +230,18 @@ bulk-api-adapter-service:
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
-      http: null
-      https: null ## @param service.clusterIP %%MAIN_CONTAINER_NAME%% service Cluster IP
+      http:
+      https:
+    ## @param service.clusterIP %%MAIN_CONTAINER_NAME%% service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
-    clusterIP: null ## @param service.loadBalancerIP %%MAIN_CONTAINER_NAME%% service Load Balancer IP
+    clusterIP:
+    ## @param service.loadBalancerIP %%MAIN_CONTAINER_NAME%% service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
-    loadBalancerIP: null ## @param service.loadBalancerSourceRanges %%MAIN_CONTAINER_NAME%% service Load Balancer sources
+    loadBalancerIP:
+    ## @param service.loadBalancerSourceRanges %%MAIN_CONTAINER_NAME%% service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
@@ -226,6 +266,7 @@ bulk-api-adapter-service:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
+
   ingress:
     enabled: true
     ## @param ingress.pathType Ingress path type
@@ -233,7 +274,8 @@ bulk-api-adapter-service:
     pathType: ImplementationSpecific
     ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
-    apiVersion: null ## @param ingress.hostname Default host for the ingress record
+    apiVersion:
+    ## @param ingress.hostname Default host for the ingress record
     ##
     hostname: bulk-api-adapter.local
     ## @param servicePort : port for the service
@@ -245,7 +287,8 @@ bulk-api-adapter-service:
     ## @param ingress.annotations Additional custom annotations for the ingress record
     ## NOTE: If `ingress.certManager=true`, annotation `kubernetes.io/tls-acme: "true"` will automatically be added
     ##
-    annotations: null ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+    annotations:
+    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
     ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
     ## You can:
     ##   - Use the `ingress.secrets` parameter to create this TLS secret
@@ -265,11 +308,12 @@ bulk-api-adapter-service:
     ##   - name: transfer-api-svc.local
     ##     path: /
     ##
-    extraHosts: null
-    extraPaths: null
-    extraTls: null
-    secrets: null
+    extraHosts:
+    extraPaths:
+    extraTls:
+    secrets:
     className: "nginx"
+
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -281,11 +325,13 @@ bulk-api-adapter-service:
   #  cpu: 100m
   #  memory: 128Mi
   resources: {}
+
 bulk-api-adapter-handler-notification:
   enabled: true
   # Default values for bulk-api-adapter-handler-notification.
   # This is a YAML-formatted file.
   # Declare variables to be passed into your templates.
+
   image:
     registry: docker.io
     repository: mojaloop/bulk-api-adapter
@@ -303,8 +349,10 @@ bulk-api-adapter-handler-notification:
     ##   - myRegistryKeySecretName
     ##
     pullSecrets: []
+
   replicaCount: 1
   command: '["node", "src/handlers/index.js", "handler", "--notification"]'
+
   ## Enable diagnostic mode in the deployment
   ##
   diagnosticMode:
@@ -313,7 +361,7 @@ bulk-api-adapter-handler-notification:
     enabled: false
     ## @param diagnosticMode.command Command to override all containers in the deployment
     ##
-    command:
+    command: 
       - node
       - src/handlers/index.js
       - handler
@@ -322,32 +370,39 @@ bulk-api-adapter-handler-notification:
     ##
     args:
       - --inspect=0.0.0.0:{{ .Values.diagnosticMode.debug.port }}
+    
     ## @param diagnosticMode.debug config to override all debug information
     ##
     debug:
       internalPort: 9229
       port: 9229
+
   readinessProbe:
     enabled: true
     httpGet:
       path: /health
     initialDelaySeconds: 60
     periodSeconds: 15
+
   livenessProbe:
     enabled: true
     httpGet:
       path: /health
     initialDelaySeconds: 60
     periodSeconds: 15
+
   ## Pod scheduling preferences.
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: {}
+
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   nodeSelector: {}
+
   ## Set toleration for scheduler
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   tolerations: []
+
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param containerSecurityContext.enabled Enabled %%MAIN_CONTAINER_NAME%% containers' Security Context
@@ -356,6 +411,7 @@ bulk-api-adapter-handler-notification:
   containerSecurityContext:
     enabled: true
     runAsUser: 1001
+
   ## metric configuration for prometheus instrumentation
   metrics:
     ## flag to enable/disable the metrics end-points
@@ -365,10 +421,12 @@ bulk-api-adapter-handler-notification:
       prefix: moja_
       defaultLabels:
         serviceName: bulk-handler-notification
+
   config:
     # this can be set if the dependency chart for kafka is disabled. If 'kafka_host' is commented out, then the name of the dependency chart will be used.
     kafka_host: kafka
     kafka_port: 9092
+
     mongo_host: 'cep-mongodb'
     mongo_port: 27017
     mongo_user: mojaloop
@@ -383,6 +441,7 @@ bulk-api-adapter-handler-notification:
     #   name: cep-mongodb
     #   key: mongodb-passwords
     mongo_database: mlos
+
     central_services_host: '$release_name-centralledger-service'
     central_services_port: 80
     security:
@@ -390,25 +449,47 @@ bulk-api-adapter-handler-notification:
         rejectUnauthorized: true
     log_level: 'info'
     log_transport: file
+
     # Protocol versions used for validating (VALIDATELIST) incoming FSPIOP API Headers (Content-type, Accept),
     # and for generating requests/callbacks from the Switch itself (DEFAULT value)
-    protocol_versions: {"CONTENT": {"DEFAULT": "1.1", "VALIDATELIST": ["1", "1.0", "1.1"]}, "ACCEPT": {"DEFAULT": "1", "VALIDATELIST": ["1", "1.0", "1.1"]}}
+    protocol_versions: |
+      {
+          "CONTENT": {
+              "DEFAULT": "1.1",
+              "VALIDATELIST": [
+                  "1",
+                  "1.0",
+                  "1.1"
+              ]
+          },
+          "ACCEPT": {
+              "DEFAULT": "1",
+              "VALIDATELIST": [
+                  "1",
+                  "1.0",
+                  "1.1"
+              ]
+          }
+      }
+
     # Parameters for JWS signing requests
     endpointSecurity:
       jwsSign: false
       fspiopSourceSigningName: 'switch'
-      jwsSigningKey: null # To generate this key:
-  # Private:
-  # ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
-  # Public:
-  # openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
-  # Should look like:
-  # -----BEGIN RSA PRIVATE KEY-----
-  # MIIJKQIBAAKCAgEAxfqaZivMPd4MpdBHu0jVMf3MSuSdkSMHn+sNJdDQfl+x4R5R
-  # ..
-  # ..
-  # mBynFpdjO0D3PnLKjnBDn1vFAfANOwVpGXCw5mn+484A/SIXYebWruFd03g4
-  # -----END RSA PRIVATE KEY-----
+      jwsSigningKey:
+        # To generate this key:
+        # Private:
+        # ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
+        # Public:
+        # openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
+        # Should look like:
+        # -----BEGIN RSA PRIVATE KEY-----
+        # MIIJKQIBAAKCAgEAxfqaZivMPd4MpdBHu0jVMf3MSuSdkSMHn+sNJdDQfl+x4R5R
+        # ..
+        # ..
+        # mBynFpdjO0D3PnLKjnBDn1vFAfANOwVpGXCw5mn+484A/SIXYebWruFd03g4
+        # -----END RSA PRIVATE KEY-----
+
   ## @param initContainers Add additional init containers to the %%MAIN_CONTAINER_NAME%% pod(s)
   ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
   ## e.g:
@@ -472,6 +553,7 @@ bulk-api-adapter-handler-notification:
           {{- end }}
         - name: DB_DATABASE
           value: '{{ .Values.config.mongo_database }}'
+
   service:
     internalPort: 8088
     ## @param service.type %%MAIN_CONTAINER_NAME%% service type
@@ -489,15 +571,18 @@ bulk-api-adapter-handler-notification:
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
-      http: null
-      https: null ## @param service.clusterIP %%MAIN_CONTAINER_NAME%% service Cluster IP
+      http:
+      https:
+    ## @param service.clusterIP %%MAIN_CONTAINER_NAME%% service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
-    clusterIP: null ## @param service.loadBalancerIP %%MAIN_CONTAINER_NAME%% service Load Balancer IP
+    clusterIP:
+    ## @param service.loadBalancerIP %%MAIN_CONTAINER_NAME%% service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
-    loadBalancerIP: null ## @param service.loadBalancerSourceRanges %%MAIN_CONTAINER_NAME%% service Load Balancer sources
+    loadBalancerIP:
+    ## @param service.loadBalancerSourceRanges %%MAIN_CONTAINER_NAME%% service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
@@ -522,6 +607,7 @@ bulk-api-adapter-handler-notification:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
+
   ingress:
     enabled: false
     ## @param ingress.pathType Ingress path type
@@ -529,7 +615,8 @@ bulk-api-adapter-handler-notification:
     pathType: ImplementationSpecific
     ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
-    apiVersion: null ## @param ingress.hostname Default host for the ingress record
+    apiVersion:
+    ## @param ingress.hostname Default host for the ingress record
     ##
     hostname: bulk-api-adapter-notification.local
     ## @param servicePort : port for the service
@@ -541,7 +628,8 @@ bulk-api-adapter-handler-notification:
     ## @param ingress.annotations Additional custom annotations for the ingress record
     ## NOTE: If `ingress.certManager=true`, annotation `kubernetes.io/tls-acme: "true"` will automatically be added
     ##
-    annotations: null ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+    annotations:
+    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
     ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
     ## You can:
     ##   - Use the `ingress.secrets` parameter to create this TLS secret
@@ -561,11 +649,12 @@ bulk-api-adapter-handler-notification:
     ##   - name: transfer-api-svc.local
     ##     path: /
     ##
-    extraHosts: null
-    extraPaths: null
-    extraTls: null
-    secrets: null
+    extraHosts:
+    extraPaths:
+    extraTls:
+    secrets:
     className: "nginx"
+
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following

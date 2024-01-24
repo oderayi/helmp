@@ -52,9 +52,17 @@ on:
 jobs:
   create_release_pr:
     if: '!github.event.pull_request.draft'
+    name: Create Release PR
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    env:
+      AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+      AWS_DEFAULT_OUTPUT: ${{ vars.AWS_DEFAULT_OUTPUT }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      EKS_CONFIG: ./config/test-mojaloop-live/eks-config.yml
+    # permissions:
+    #   contents: write
     steps:
       - name: Checkout
         id: checkout
@@ -73,12 +81,11 @@ jobs:
       #   id: install-dpendencies
       #   run: |
       #     # Install mo
-      #     curl -sL -o /tmp/mo https://raw.githubusercontent.com/tests-always-included/mo/master/mo
-      #     chmod +x /tmp/mo
-      #     sudo mv /tmp/mo /usr/local/bin/
+      #     curl -sL https://raw.githubusercontent.com/tests-always-included/mo/master/mo -o /usr/local/bin/mo
+      #     chmod +x /usr/local/bin/mo
 
       #     # Install updatecli
-      #     curl -sL -o /tmp/updatecli_amd64.deb https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb
+      #     curl -sL https://github.com/updatecli/updatecli/releases/download/v0.68.0/updatecli_amd64.deb -o /tmp/updatecli_amd64.deb
       #     sudo apt install /tmp/updatecli_amd64.deb
 
       #     # Install jq
@@ -162,32 +169,53 @@ jobs:
           sed -i "s/{{CI_HELM_NAMESPACE}}/${{ inputs.deployment_namespace }}/" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
           sed -i "s/{{CI_ENV_VERSION}}/${{ steps.determine-release-version.outputs.RELEASE_VERSION }}/" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
       
+      - name: Install YQ # Ref: https://mikefarah.gitbook.io/yq/
+        run: |
+           wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq &&\
+           chmod +x /usr/local/bin/yq
+
+      - name: Get EKS Cluster Name
+        id: get-eks-cluster-name
+        run: |
+          export EKS_CLUSTER_NAME=$(cat .tmp/oss-core-env/config/test-mojaloop-live/eks-config.yml | yq '.metadata.name')
+          echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME"
+          echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME" >> $GITHUB_ENV
+      
+      - name: Set KubeConfig
+        run: |
+          echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME"
+          aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+
+      - name: Cluster Info
+        run: |
+          kubectl cluster-info
+      
       - name: Deploy charts
         id: deploy-charts
         run: |
           echo "${{ secrets.AUTO_RELEASE_KUBECONFIG }}" > .tmp/test.mojaloop.live
           
-          echo "Adding helm repos"
-          helm repo add stable https://charts.helm.sh/stable
-          helm repo add incubator https://charts.helm.sh/incubator
-          helm repo add kiwigrid https://kiwigrid.github.io
-          helm repo add kokuwa https://kokuwaio.github.io/helm-charts
-          helm repo add elastic https://helm.elastic.co
-          helm repo add codecentric https://codecentric.github.io/helm-charts
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add mojaloop-charts https://mojaloop.github.io/charts/repo 
-          helm repo add redpanda https://charts.redpanda.com
-          helm repo add mojaloop https://mojaloop.io/helm/repo/
-          helm repo update
+          # echo "Adding helm repos"
+          # helm repo add stable https://charts.helm.sh/stable
+          # helm repo add incubator https://charts.helm.sh/incubator
+          # helm repo add kiwigrid https://kiwigrid.github.io
+          # helm repo add kokuwa https://kokuwaio.github.io/helm-charts
+          # helm repo add elastic https://helm.elastic.co
+          # helm repo add codecentric https://codecentric.github.io/helm-charts
+          # helm repo add bitnami https://charts.bitnami.com/bitnami
+          # helm repo add mojaloop-charts https://mojaloop.github.io/charts/repo 
+          # helm repo add redpanda https://charts.redpanda.com
+          # helm repo add mojaloop https://mojaloop.io/helm/repo/
+          # helm repo update
 
           # Delete existing deployments
-          helm ls -n ${{ inputs.deployment_namespace }} --short --kubeconfig=.tmp/test.mojaloop.live | xargs -L1 helm uninstall -n ${{ inputs.deployment_namespace }} --kubeconfig=.tmp/test.mojaloop.live
+          helm ls -n ${{ inputs.deployment_namespace }} --short --kubeconfig=.tmp/test.mojaloop.live | xargs -L1 helm uninstall -n ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live
           
           # Deploy example-backend
           helm install backend mojaloop/example-mojaloop-backend --kubeconfig=.tmp/test.mojaloop.live --namespace ${{ inputs.deployment_namespace }} 
           
           # Install Mojaloop
-          helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }} --kubeconfig=.tmp/test.mojaloop.live
+          helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live
 
 
       # - name: Deploy charts to test environment

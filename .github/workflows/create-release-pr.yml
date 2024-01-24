@@ -150,7 +150,7 @@ jobs:
         with:
           token: ${{ secrets.AUTO_RELEASE_TOKEN }}
           # repository: mojaloop/oss-core-env
-          repository: oderayi/oss-core-envp
+          repository: oderayi/oss-core-env
           ref: main
           path: .tmp/oss-core-env
       

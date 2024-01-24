@@ -204,13 +204,14 @@ jobs:
           KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
           # Delete existing deployments
-            helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 sh -c 'if [ -n "$1" ]; then helm uninstall -n ${{ inputs.deployment_namespace }} "$1"; fi' _
+          helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 sh -c 'if [ -n "$1" ]; then helm uninstall -n ${{ inputs.deployment_namespace }} "$1"; fi' _
       
       - name: Setup Helm Repos
         id: setup-helm-repos
         env:
           KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
+          # Setup Helm Repos
           helm repo add stable https://charts.helm.sh/stable
           helm repo add incubator https://charts.helm.sh/incubator
           helm repo add kiwigrid https://kiwigrid.github.io
@@ -228,6 +229,7 @@ jobs:
         env:
           KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
+          # Install example-backend
           helm install backend mojaloop/example-mojaloop-backend --namespace ${{ inputs.deployment_namespace }}
 
       - name: Deploy charts
@@ -236,4 +238,5 @@ jobs:
           KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
           # Install Mojaloop
+          ./update-charts-dep.sh
           helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }}

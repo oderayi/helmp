@@ -181,33 +181,30 @@ jobs:
       #     echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME"
       #     echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME" >> $GITHUB_ENV
       
-      # - name: Set KubeConfig
-      #   run: |
-      #     echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME"
-      #     aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+      - name: Set KubeConfig
+        run: |
+          # echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME"
+          # aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
-      # - name: Cluster Info
-      #   run: |
-      #     kubectl cluster-info
+          echo "${{ secrets.AUTO_RELEASE_KUBECONFIG }}" > .tmp/test.mojaloop.live.conf
+          export KUBECONFIG=.tmp/test.mojaloop.live.conf
+
+      - name: Cluster Info
+        run: |
+          kubectl cluster-info
+          kubectl get pods -A -o wide
       
       - name: Deploy charts
         id: deploy-charts
         run: |
-          echo "${{ secrets.AUTO_RELEASE_KUBECONFIG }}" > .tmp/test.mojaloop.live.conf
-          export KUBECONFIG=.tmp/test.mojaloop.live.conf
-          # kubectl config view
-          kubectl get pods -A
-          # kubectl get pods -A -o wide
-          # kubectl get pods -A -o wide | grep mojaloop
-
           # Delete existing deployments
-          helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 helm uninstall -n ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live.conf
+            helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 sh -c 'if [ -n "$1" ]; then helm uninstall -n ${{ inputs.deployment_namespace }} "$1"; fi' _
           
           # Deploy example-backend
-          helm install backend mojaloop/example-mojaloop-backend --namespace ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live.conf
+          helm install backend mojaloop/example-mojaloop-backend --namespace ${{ inputs.deployment_namespace }}
           
           # Install Mojaloop
-          helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live.conf
+          helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }}
 
 
       # - name: Deploy charts to test environment

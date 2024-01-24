@@ -187,7 +187,10 @@ jobs:
           # aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
           echo "${{ secrets.AUTO_RELEASE_KUBECONFIG }}" > .tmp/test.mojaloop.live.conf
-
+          
+          # Secure file, remove group read access
+          chmod 600 .tmp/test.mojaloop.live.conf
+          
       - name: Cluster Info
         env:
           KUBECONFIG: .tmp/test.mojaloop.live.conf

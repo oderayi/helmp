@@ -149,7 +149,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.AUTO_RELEASE_TOKEN }}
-          repository: mojaloop/oss-core-env
+          # repository: mojaloop/oss-core-env
+          repository: oss-core-envp
           ref: master
           path: .tmp/oss-core-env
       

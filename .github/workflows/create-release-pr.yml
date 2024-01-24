@@ -54,13 +54,13 @@ jobs:
     if: '!github.event.pull_request.draft'
     name: Create Release PR
     runs-on: ubuntu-latest
-    env:
-      AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-      AWS_DEFAULT_OUTPUT: ${{ vars.AWS_DEFAULT_OUTPUT }}
-      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      EKS_CONFIG: .tmp/oss-core-env/config/test-mojaloop-live/eks-config.yml
+    # env:
+      # AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+      # AWS_DEFAULT_OUTPUT: ${{ vars.AWS_DEFAULT_OUTPUT }}
+      # AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # EKS_CONFIG: .tmp/oss-core-env/config/test-mojaloop-live/eks-config.yml
     # permissions:
     #   contents: write
     steps:
@@ -217,17 +217,3 @@ jobs:
         run: |
           # Install Mojaloop
           helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }}
-  
-
-      # - name: Deploy charts to test environment
-      #   uses: 'deliverybot/helm@v1'
-      #   with:
-      #     token: ${{ secrets.AUTO_RELEASE_TOKEN }}
-      #     release: ${{ inputs.deployment_release_name }}
-      #     namespace: ${{ inputs.deployment_namespace }}
-      #     chart: mojaloop
-      #     value-files: |
-      #       - .tmp/oss-core-env/${{ inputs.deployment_values_file}}
-      #   env:
-      #     KUBECONFIG_FILE: ${{ secrets.AUTO_RELEASE_KUBECONFIG }}
-    

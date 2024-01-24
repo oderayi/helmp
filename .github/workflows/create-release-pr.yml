@@ -177,9 +177,6 @@ jobs:
       - name: Get EKS Cluster Name
         id: get-eks-cluster-name
         run: |
-          echo $PWD
-          ls -la .tmp/oss-core-env/config/test-mojaloop-live/
-          cat ./.tmp/oss-core-env/config/test-mojaloop-live/eks-config.yml
           export EKS_CLUSTER_NAME=$(cat .tmp/oss-core-env/config/test-mojaloop-live/eks-config.yml | yq '.metadata.name')
           echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME"
           echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME" >> $GITHUB_ENV
@@ -197,19 +194,6 @@ jobs:
         id: deploy-charts
         run: |
           echo "${{ secrets.AUTO_RELEASE_KUBECONFIG }}" > .tmp/test.mojaloop.live
-          
-          # echo "Adding helm repos"
-          # helm repo add stable https://charts.helm.sh/stable
-          # helm repo add incubator https://charts.helm.sh/incubator
-          # helm repo add kiwigrid https://kiwigrid.github.io
-          # helm repo add kokuwa https://kokuwaio.github.io/helm-charts
-          # helm repo add elastic https://helm.elastic.co
-          # helm repo add codecentric https://codecentric.github.io/helm-charts
-          # helm repo add bitnami https://charts.bitnami.com/bitnami
-          # helm repo add mojaloop-charts https://mojaloop.github.io/charts/repo 
-          # helm repo add redpanda https://charts.redpanda.com
-          # helm repo add mojaloop https://mojaloop.io/helm/repo/
-          # helm repo update
 
           # Delete existing deployments
           helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 helm uninstall -n ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live

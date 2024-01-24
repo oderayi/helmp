@@ -159,7 +159,7 @@ jobs:
           # repository: mojaloop/oss-core-env
           repository: oderayi/oss-core-env
           ref: main
-          path: .tmp
+          path: .tmp/oss-core-env
       
       - name: Prep deployment values file
         id: prep-deployment-values-file

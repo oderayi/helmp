@@ -232,14 +232,32 @@ jobs:
       #     # Install example-backend
       #     helm install backend mojaloop/example-mojaloop-backend --namespace ${{ inputs.deployment_namespace }}
 
+      - name: Build charts
+        id: build-charts
+        run: |
+          ./update-charts-dep.sh
+          
       - name: Deploy charts
         id: deploy-charts
         env:
           KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
           # Install Mojaloop
-          # find . -maxdepth 1 -type d -not -path '*/\.*' | sed 's/^\.\///g' | xargs -I {} helm repo index {} 
-          ./update-charts-dep.sh
-          # ls -la
-          # ./rebuild-charts.sh
           helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }}
+      
+      - name: Wait for deployment to be ready
+        run: |
+          # Wait until all pods are ready
+          while [[ $(kubectl get pods -n ${{ inputs.deployment_namespace }} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' | grep False) ]]; do 
+            echo "Waiting for pods to be ready..."
+            sleep 10
+          done
+          echo "All pods are ready!"
+      
+      - name: Run TTK tests
+        id: run-ttk-tests
+        env:
+          KUBECONFIG: .tmp/test.mojaloop.live.conf
+        run: |
+          # Run TTK tests
+          helm test ${{ inputs.deployment_release_name }} --namespace ${{ inputs.deployment_namespace }}

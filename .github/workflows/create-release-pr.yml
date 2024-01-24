@@ -246,6 +246,8 @@ jobs:
           helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }}
       
       - name: Wait for deployment to be ready
+        env:
+          KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
           # Wait until all pods are ready
           while [[ $(kubectl get pods -n ${{ inputs.deployment_namespace }} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}' | grep False) ]]; do 

@@ -195,20 +195,29 @@ jobs:
           kubectl cluster-info
           kubectl get pods -A -o wide
       
-      - name: Deploy charts
-        id: deploy-charts
+      - name: Delete existing deployments
+        id: delete-existing-deployments
         env:
           KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
           # Delete existing deployments
             helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 sh -c 'if [ -n "$1" ]; then helm uninstall -n ${{ inputs.deployment_namespace }} "$1"; fi' _
-          
-          # Deploy example-backend
+      
+      - name: Deploy example-backend
+        id: deploy-example-backend
+        env:
+          KUBECONFIG: .tmp/test.mojaloop.live.conf
+        run: |
           helm install backend mojaloop/example-mojaloop-backend --namespace ${{ inputs.deployment_namespace }}
-          
+
+      - name: Deploy charts
+        id: deploy-charts
+        env:
+          KUBECONFIG: .tmp/test.mojaloop.live.conf
+        run: |
           # Install Mojaloop
           helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }}
-
+  
 
       # - name: Deploy charts to test environment
       #   uses: 'deliverybot/helm@v1'

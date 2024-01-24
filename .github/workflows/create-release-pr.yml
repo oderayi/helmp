@@ -160,7 +160,7 @@ jobs:
           set -a && . .tmp/oss-core-env/config/test-mojaloop-live/.env && set +a
           sed -i "s/{{CI_ENV_NAME}}/$ENV_NAME/" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
           sed -i "s/{{CI_HELM_NAMESPACE}}/${{ inputs.deployment_namespace }}/" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
-          sed -i "s/{{CI_ENV_VERSION}}/${{ steps.determine-release-version.outputs.RELEASE_VERSION }}//" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
+          sed -i "s/{{CI_ENV_VERSION}}/${{ steps.determine-release-version.outputs.RELEASE_VERSION }}/" .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }}
       
       - name: Deploy charts
         id: deploy-charts

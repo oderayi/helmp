@@ -195,10 +195,10 @@ jobs:
         run: |
           echo "${{ secrets.AUTO_RELEASE_KUBECONFIG }}" > .tmp/test.mojaloop.live.conf
           export KUBECONFIG=.tmp/test.mojaloop.live.conf
-          kubectl config view
+          # kubectl config view
           kubectl get pods -A
-          kubectl get pods -A -o wide
-          kubectl get pods -A -o wide | grep mojaloop
+          # kubectl get pods -A -o wide
+          # kubectl get pods -A -o wide | grep mojaloop
 
           # Delete existing deployments
           helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 helm uninstall -n ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live.conf

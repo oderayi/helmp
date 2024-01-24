@@ -47,7 +47,7 @@ on:
         type: string
         description: "Deployment values file in oss-core-env repo"
         required: true
-        default: "helm-values-moja2-mojaloop-v15.2.0.yaml"
+        default: "helm-values-moja2-mojaloop-v15.3.0.yaml"
 
 jobs:
   create_release_pr:
@@ -150,7 +150,7 @@ jobs:
         with:
           token: ${{ secrets.AUTO_RELEASE_TOKEN }}
           # repository: mojaloop/oss-core-env
-          repository: oss-core-envp
+          repository: oderayi/oss-core-envp
           ref: master
           path: .tmp/oss-core-env
       

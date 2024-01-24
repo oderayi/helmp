@@ -239,6 +239,6 @@ jobs:
         run: |
           # Install Mojaloop
           find . -maxdepth 1 -type d -not -path '*/\.*' | sed 's/^\.\///g' | xargs -I {} helm repo index {} 
-          ./update-charts-dep.sh || true
-          ./rebuild-charts.sh || true
+          # ./update-charts-dep.sh || true
+          ./rebuild-charts.sh
           helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }}

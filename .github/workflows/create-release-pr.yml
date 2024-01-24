@@ -209,10 +209,10 @@ jobs:
           # helm repo update
 
           # Delete existing deployments
-          helm ls -n ${{ inputs.deployment_namespace }} --short --kubeconfig=.tmp/test.mojaloop.live | xargs -L1 helm uninstall -n ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live
+          helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 helm uninstall -n ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live
           
           # Deploy example-backend
-          helm install backend mojaloop/example-mojaloop-backend --kubeconfig=.tmp/test.mojaloop.live --namespace ${{ inputs.deployment_namespace }} 
+          helm install backend mojaloop/example-mojaloop-backend --namespace ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live
           
           # Install Mojaloop
           helm install ${{ inputs.deployment_release_name }} ./mojaloop -f .tmp/oss-core-env/config/test-mojaloop-live/${{ inputs.deployment_values_file }} --namespace ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live

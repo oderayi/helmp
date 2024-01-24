@@ -196,7 +196,7 @@ jobs:
           KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
           kubectl cluster-info
-          kubectl get pods -A -o wide
+          # kubectl get pods -A -o wide
       
       # - name: Delete existing deployments
       #   id: delete-existing-deployments

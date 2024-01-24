@@ -187,15 +187,18 @@ jobs:
           # aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
           echo "${{ secrets.AUTO_RELEASE_KUBECONFIG }}" > .tmp/test.mojaloop.live.conf
-          export KUBECONFIG=.tmp/test.mojaloop.live.conf
 
       - name: Cluster Info
+        env:
+          KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
           kubectl cluster-info
           kubectl get pods -A -o wide
       
       - name: Deploy charts
         id: deploy-charts
+        env:
+          KUBECONFIG: .tmp/test.mojaloop.live.conf
         run: |
           # Delete existing deployments
             helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 sh -c 'if [ -n "$1" ]; then helm uninstall -n ${{ inputs.deployment_namespace }} "$1"; fi' _

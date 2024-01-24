@@ -179,6 +179,7 @@ jobs:
         run: |
           echo $PWD
           ls -la .tmp/oss-core-env/config/test-mojaloop-live/
+          cat .tmp/oss-core-env/config/test-mojaloop-live/eks-config.yml
           export EKS_CLUSTER_NAME=$(cat .tmp/oss-core-env/config/test-mojaloop-live/eks-config.yml | yq '.metadata.name')
           echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME"
           echo "EKS_CLUSTER_NAME=$EKS_CLUSTER_NAME" >> $GITHUB_ENV

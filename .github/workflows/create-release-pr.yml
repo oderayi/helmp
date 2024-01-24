@@ -151,7 +151,7 @@ jobs:
           token: ${{ secrets.AUTO_RELEASE_TOKEN }}
           # repository: mojaloop/oss-core-env
           repository: oderayi/oss-core-envp
-          ref: master
+          ref: main
           path: .tmp/oss-core-env
       
       - name: Prep deployment values file

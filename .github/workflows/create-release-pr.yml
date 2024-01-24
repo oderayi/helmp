@@ -60,7 +60,7 @@ jobs:
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      EKS_CONFIG: ./config/test-mojaloop-live/eks-config.yml
+      EKS_CONFIG: .tmp/oss-core-env/config/test-mojaloop-live/eks-config.yml
     # permissions:
     #   contents: write
     steps:
@@ -193,8 +193,6 @@ jobs:
       - name: Deploy charts
         id: deploy-charts
         run: |
-          echo "${{ secrets.AUTO_RELEASE_KUBECONFIG }}" > .tmp/test.mojaloop.live
-
           # Delete existing deployments
           helm ls -n ${{ inputs.deployment_namespace }} --short | xargs -L1 helm uninstall -n ${{ inputs.deployment_namespace }} # --kubeconfig=.tmp/test.mojaloop.live
           
